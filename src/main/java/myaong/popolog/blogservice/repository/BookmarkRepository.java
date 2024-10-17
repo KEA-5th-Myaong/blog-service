@@ -4,4 +4,6 @@ import myaong.popolog.blogservice.entity.Bookmark;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
+
+	Boolean existsByIdAndMemberId(Long id, Long memberId);
 }
