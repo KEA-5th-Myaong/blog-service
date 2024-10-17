@@ -6,41 +6,24 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Builder
 @Getter
 public class PostsResponse {
 
-	Long lastId;
-	List<Posts> posts;
-
-	@Getter
-	public static class Posts {
-		Long postId;
-		String title;
-		String thumbnailUrl;
-		String content;
-		LocalDateTime timestamp;
-		Long memberId;
-		String nickname;
-		String profilePicUrl;
-		Boolean isBookmarked;
-
-		@Builder
-		public Posts(Long postId, String title, String thumbnailUrl, String content, LocalDateTime timestamp, Long memberId, String nickname, String profilePicUrl, Boolean isBookmarked) {
-			this.postId = postId;
-			this.title = title;
-			this.thumbnailUrl = thumbnailUrl;
-			this.content = content;
-			this.timestamp = timestamp;
-			this.memberId = memberId;
-			this.nickname = nickname;
-			this.profilePicUrl = profilePicUrl;
-			this.isBookmarked = isBookmarked;
-		}
-	}
+	private Long lastId;
+	private List<Posts> posts;
 
 	@Builder
-	public PostsResponse(Long lastId, List<Posts> posts) {
-		this.lastId = lastId;
-		this.posts = posts;
+	@Getter
+	public static class Posts {
+		private Long postId;
+		private String title;
+		private String thumbnailUrl;
+		private String content;
+		private LocalDateTime timestamp;
+		private Long memberId;
+		private String nickname;
+		private String profilePicUrl;
+		private Boolean isBookmarked;
 	}
 }
