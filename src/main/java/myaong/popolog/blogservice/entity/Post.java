@@ -27,8 +27,7 @@ public class Post extends BaseEntity {
 	@Column(name = "title", nullable = false)
 	private String title;
 
-	@Lob
-	@Column(name = "content", nullable = false)
+	@Column(name = "content", nullable = false, columnDefinition = "text")
 	private String content;
 
 	// 섬네일 주소

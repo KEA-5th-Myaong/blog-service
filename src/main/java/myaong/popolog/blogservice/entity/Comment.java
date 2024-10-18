@@ -32,8 +32,7 @@ public class Comment extends BaseEntity {
 	@JoinColumn(name = "parent_comment_id", updatable = false)
 	private Comment parentComment;
 
-	@Lob
-	@Column(name = "content", nullable = false)
+	@Column(name = "content", nullable = false, columnDefinition = "text")
 	private String content;
 
 	@Column(name = "is_blinded", nullable = false)
