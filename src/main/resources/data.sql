@@ -1,4 +1,4 @@
-insert into "member_profile" (member_id, nickname, profile_pic_url, created_at, updated_at) values
+insert into `member_profile` (member_id, nickname, profile_pic_url, created_at, updated_at) values
 	(1, '최상위', null, now(), now()),
 	(2, '관리자1', null, now(), now()),
 	(3, '관리자2', null, now(), now()),
@@ -9,7 +9,7 @@ insert into "member_profile" (member_id, nickname, profile_pic_url, created_at, 
 	(8, '회원4', null, now(), now()),
 	(9, '회원5', 'https://culturabcs.gob.mx/defaults/profile.png', now(), now());
 
-insert into "post" (post_id, member_id, title, content, is_blinded, created_at, updated_at) values
+insert into `post` (post_id, member_id, title, content, is_blinded, created_at, updated_at) values
 	(1, 5, 'Aperiam eos in repellendus doloremque.', 'Iusto magni nemo quisquam iusto. Nulla dicta libero.', false, now(), now()),
 	(2, 5, 'A quia vero sapiente. Facilis et excepturi.', 'Illo omnis perferendis magni. Dicta doloremque nihil expedita nisi.
 Quo maiores sapiente nesciunt.', false, now(), now()),
@@ -23,7 +23,7 @@ Quo maiores sapiente nesciunt.', false, now(), now()),
 Quibusdam quo blanditiis neque eaque.', false, now(), now()),
 	(10, 6, 'Alias iure velit optio quis optio.', 'Eveniet expedita tenetur. Sed exercitationem dolores suscipit.', false, now(), now());
 
-insert into "comment" (comment_id, post_id, member_id, parent_comment_id, content, is_blinded, created_at, updated_at) values
+insert into `comment` (comment_id, post_id, member_id, parent_comment_id, content, is_blinded, created_at, updated_at) values
 	(1, 9, 5, null, 'Ea aspernatur aut asperiores at laborum. Deserunt ad molestiae ex doloremque ipsum temporibus.', false, now(), now()),
 	(2, 9, 7, 1, 'Pariatur veniam voluptatibus iste. Laboriosam non sunt qui cupiditate dolore.', false, now(), now()),
 	(3, 9, 8, 1, 'Quod ab eum velit.
@@ -60,7 +60,7 @@ Quae error beatae. Excepturi earum delectus tempora assumenda minus quae.', fals
 	(32, 2, 5, 30, 'Magnam minima excepturi ipsa quos. Numquam sed reprehenderit eveniet quas similique quis.', false, now(), now()),
 	(33, 2, 5, 30, 'Provident consequuntur aut repellat eius sint. Eligendi ea error similique quas nulla impedit.', false, now(), now());
 
-insert into "like" (like_id, member_id, post_id, created_at, updated_at) values
+insert into `like` (like_id, member_id, post_id, created_at, updated_at) values
 	(1, 8, 2, now(), now()),
 	(2, 10, 10, now(), now()),
 	(3, 6, 7, now(), now()),
@@ -72,11 +72,11 @@ insert into "like" (like_id, member_id, post_id, created_at, updated_at) values
 	(9, 10, 6, now(), now()),
 	(10, 9, 4, now(), now());
 
-insert into "bookmark" (bookmark_id, member_id, post_id, created_at, updated_at) values
+insert into `bookmark` (bookmark_id, member_id, post_id, created_at, updated_at) values
 	(1, 5, 4, now(), now()),
 	(2, 5, 6, now(), now());
 
-insert into "report" (report_id, member_id, contents_id, contents_type, created_at, updated_at) values
+insert into `report` (report_id, member_id, contents_id, contents_type, created_at, updated_at) values
 	(1, 10, 1, 'POST', now(), now()),
 	(2, 7, 8, 'POST', now(), now()),
 	(3, 7, 7, 'COMMENT', now(), now()),
