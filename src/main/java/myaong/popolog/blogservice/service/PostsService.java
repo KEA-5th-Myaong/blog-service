@@ -1,9 +1,7 @@
 package myaong.popolog.blogservice.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import myaong.popolog.blogservice.dto.request.PageRequest;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
@@ -21,7 +19,7 @@ public class PostsService {
 	private final PostRepository postRepository;
 	private final BookmarkRepository bookmarkRepository;
 
-	public PostsResponse getRecent(Long memberId, PageRequest request){
+	public PostsResponse getRecent(Long memberId, Long lastId){
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
 
@@ -57,7 +55,7 @@ public class PostsService {
 				.posts(posts).build();
 	}
 
-	public PostsResponse search(Long memberId, String search, PageRequest request){
+	public PostsResponse search(Long memberId, String search, Long lastId){
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
 
@@ -93,7 +91,7 @@ public class PostsService {
 				.posts(posts).build();
 	}
 
-	public PostsResponse getPostsOf(long memberId, @Valid PageRequest request) {
+	public PostsResponse getPostsOf(long memberId, Long lastId) {
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
 

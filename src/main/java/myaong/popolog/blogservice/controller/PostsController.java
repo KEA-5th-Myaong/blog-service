@@ -1,9 +1,7 @@
 package myaong.popolog.blogservice.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
-import myaong.popolog.blogservice.dto.request.PageRequest;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.service.PostsService;
 import org.springframework.http.ResponseEntity;
@@ -16,24 +14,24 @@ public class PostsController {
 
 	private final PostsService postsService;
 
-	@GetMapping
+	@GetMapping("/{lastId}")
 	public ResponseEntity<ApiResponse<PostsResponse>> getRecent(@RequestParam(name = "search", required = false) String search,
-																@Valid @RequestBody PageRequest request) {
+																@PathVariable Long lastId) {
 
 		PostsResponse res;
 		if (search == null)
-			res = postsService.getRecent(5L, request);
+			res = postsService.getRecent(5L, lastId);
 		else
-			res = postsService.search(5L, search, request);
+			res = postsService.search(5L, search, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
-	@GetMapping("/members/{memberId}")
+	@GetMapping("/members/{memberId}/{lastId}")
 	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(@PathVariable String memberId,
-																 @Valid @RequestBody PageRequest request) {
+																 @PathVariable Long lastId) {
 
-		PostsResponse res = postsService.getPostsOf(5L, request);
+		PostsResponse res = postsService.getPostsOf(5L, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}

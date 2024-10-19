@@ -1,14 +1,14 @@
 package myaong.popolog.blogservice.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
-import myaong.popolog.blogservice.dto.request.PageRequest;
-import myaong.popolog.blogservice.dto.request.RecommendRequest;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.service.BlogService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/blog")
@@ -17,26 +17,29 @@ public class BlogController {
 
 	private final BlogService blogService;
 
-	@GetMapping("/recommend")
-	public ResponseEntity<ApiResponse<PostsResponse>> getRecommend(@Valid @RequestBody RecommendRequest request) {
+	@GetMapping("/recommend/{lastId}")
+	public ResponseEntity<ApiResponse<PostsResponse>> getRecommend(@RequestParam("preJob") String rawPreJob,
+																   @PathVariable Long lastId) {
 
-		PostsResponse res = blogService.getRecommend(5L, request);
+		List<Long> preJob = Arrays.stream(rawPreJob.split(",")).map(Long::valueOf).toList();
 
-		return ResponseEntity.ok(ApiResponse.onSuccess(res));
-	}
-
-	@GetMapping("/following")
-	public ResponseEntity<ApiResponse<PostsResponse>> getFollowing(@Valid @RequestBody PageRequest request) {
-
-		PostsResponse res = blogService.getFollowing(5L, request);
+		PostsResponse res = blogService.getRecommend(5L, preJob, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
-	@GetMapping("/bookmark")
-	public ResponseEntity<ApiResponse<PostsResponse>> getBookmark(@Valid @RequestBody PageRequest request) {
+	@GetMapping("/following/{lastId}")
+	public ResponseEntity<ApiResponse<PostsResponse>> getFollowing(@PathVariable Long lastId) {
 
-		PostsResponse res = blogService.getBookmark(5L, request);
+		PostsResponse res = blogService.getFollowing(5L, lastId);
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(res));
+	}
+
+	@GetMapping("/bookmark/{lastId}")
+	public ResponseEntity<ApiResponse<PostsResponse>> getBookmark(@PathVariable Long lastId) {
+
+		PostsResponse res = blogService.getBookmark(5L, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
