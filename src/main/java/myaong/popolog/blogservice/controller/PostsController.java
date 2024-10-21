@@ -1,5 +1,6 @@
 package myaong.popolog.blogservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.response.PostDetailResponse;
@@ -15,6 +16,7 @@ public class PostsController {
 
 	private final PostsService postsService;
 
+	@Operation(summary = "API 명세서 v0.3 line 36", description = "블로그 포스트 목록 조회")
 	@GetMapping("/members/{memberId}/{lastId}")
 	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(@PathVariable String memberId,
 																 @PathVariable Long lastId) {
@@ -24,6 +26,7 @@ public class PostsController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
+	@Operation(summary = "API 명세서 v0.3 line 37", description = "포스트 조회")
 	@GetMapping("/{postId}")
 	public ResponseEntity<ApiResponse<PostDetailResponse>> getPostById(@PathVariable Long postId) {
 		PostDetailResponse res = postsService.getPostById(postId);
