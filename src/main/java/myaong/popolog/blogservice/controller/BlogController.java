@@ -17,6 +17,23 @@ public class BlogController {
 
 	private final BlogService blogService;
 
+	@GetMapping("/recent/{lastId}")
+	public ResponseEntity<ApiResponse<PostsResponse>> getRecent(@PathVariable Long lastId) {
+
+		PostsResponse res = blogService.getRecent(5L, lastId);
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(res));
+	}
+
+	@GetMapping("/search/{lastId}")
+	public ResponseEntity<ApiResponse<PostsResponse>> getSearch(@RequestParam(name = "search") String search,
+																@PathVariable Long lastId) {
+
+		PostsResponse res = blogService.search(5L, search, lastId);
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(res));
+	}
+
 	@GetMapping("/recommend/{lastId}")
 	public ResponseEntity<ApiResponse<PostsResponse>> getRecommend(@RequestParam("preJob") String rawPreJob,
 																   @PathVariable Long lastId) {

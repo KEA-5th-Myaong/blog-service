@@ -14,19 +14,6 @@ public class PostsController {
 
 	private final PostsService postsService;
 
-	@GetMapping("/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getRecent(@RequestParam(name = "search", required = false) String search,
-																@PathVariable Long lastId) {
-
-		PostsResponse res;
-		if (search == null)
-			res = postsService.getRecent(5L, lastId);
-		else
-			res = postsService.search(5L, search, lastId);
-
-		return ResponseEntity.ok(ApiResponse.onSuccess(res));
-	}
-
 	@GetMapping("/members/{memberId}/{lastId}")
 	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(@PathVariable String memberId,
 																 @PathVariable Long lastId) {
