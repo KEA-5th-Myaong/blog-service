@@ -1,12 +1,17 @@
 package myaong.popolog.blogservice.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.common.exception.ApiCode;
+import myaong.popolog.blogservice.common.exception.ApiException;
+import myaong.popolog.blogservice.dto.response.PostDetailResponse;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
+import myaong.popolog.blogservice.entity.Comment;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
+import myaong.popolog.blogservice.repository.CommentRepository;
 import myaong.popolog.blogservice.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +23,9 @@ public class PostsService {
 
 	private final PostRepository postRepository;
 	private final BookmarkRepository bookmarkRepository;
+	private final CommentRepository commentRepository;
 
+	@Transactional(readOnly = true)
 	public PostsResponse getPostsOf(long memberId, Long lastId) {
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
@@ -54,5 +61,17 @@ public class PostsService {
 		return PostsResponse.builder()
 				.lastId(minId)
 				.posts(posts).build();
+	}
+
+	@Transactional(readOnly = true)
+	public PostDetailResponse getPostById(Long postId) {
+		Post post = postRepository.findById(postId)
+				.orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+		List<Comment> comments = commentRepository.findByPostId(postId);
+
+		boolean isBookmarked = bookmarkRepository.existsByIdAndMemberId(postId, 5L);
+
+		return PostDetailResponse.of(post, comments, isBookmarked);
 	}
 }

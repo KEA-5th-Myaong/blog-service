@@ -1,12 +1,13 @@
 package myaong.popolog.blogservice.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
+import myaong.popolog.blogservice.repository.CommentRepository;
 import myaong.popolog.blogservice.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,8 @@ public class BlogService {
 	private final PostRepository postRepository;
 	private final BookmarkRepository bookmarkRepository;
 
+
+	@Transactional(readOnly = true)
 	public PostsResponse getRecent(Long memberId, Long lastId){
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
@@ -55,6 +58,7 @@ public class BlogService {
 				.lastId(minId)
 				.posts(posts).build();
 	}
+
 
 	public PostsResponse search(Long memberId, String search, Long lastId){
 
@@ -93,6 +97,7 @@ public class BlogService {
 				.posts(posts).build();
 	}
 
+	@Transactional(readOnly = true)
 	public PostsResponse getRecommend(Long memberId, List<Long> preJob, Long lastId) {
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
@@ -130,6 +135,7 @@ public class BlogService {
 				.posts(posts).build();
 	}
 
+	@Transactional(readOnly = true)
 	public PostsResponse getFollowing(Long memberId, Long lastId){
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
@@ -167,6 +173,7 @@ public class BlogService {
 				.posts(posts).build();
 	}
 
+	@Transactional(readOnly = true)
 	public PostsResponse getBookmark(Long memberId, Long lastId){
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
