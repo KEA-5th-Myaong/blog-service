@@ -2,8 +2,6 @@ package myaong.popolog.blogservice.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import myaong.popolog.blogservice.dto.request.PageRequest;
-import myaong.popolog.blogservice.dto.request.RecommendRequest;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
@@ -21,7 +19,7 @@ public class BlogService {
 	private final PostRepository postRepository;
 	private final BookmarkRepository bookmarkRepository;
 
-	public PostsResponse getRecommend(Long memberId, RecommendRequest request) {
+	public PostsResponse getRecommend(Long memberId, List<Long> preJob, Long lastId) {
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
 
@@ -57,7 +55,7 @@ public class BlogService {
 				.posts(posts).build();
 	}
 
-	public PostsResponse getFollowing(Long memberId, PageRequest request){
+	public PostsResponse getFollowing(Long memberId, Long lastId){
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
 
@@ -93,7 +91,7 @@ public class BlogService {
 				.posts(posts).build();
 	}
 
-	public PostsResponse getBookmark(Long memberId, PageRequest request){
+	public PostsResponse getBookmark(Long memberId, Long lastId){
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
 

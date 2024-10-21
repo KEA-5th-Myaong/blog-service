@@ -15,3 +15,13 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://127.0.0.1:8761/eureka # eureka ??? ??
+
+springdoc:
+  api-docs:
+    version: openapi_3_1
+    enabled: true
+    path: /blog/v3/api-docs
+
+  enable-spring-security: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

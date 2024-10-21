@@ -1,25 +1,21 @@
 package myaong.popolog.blogservice.config;
 
-import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
+@OpenAPIDefinition(
+        info = @Info(title = "Popolog Blog Service API Document", description = "Popolog Member Service 명세서", version = "v0.3")
+)
 public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-                .components(new Components())
-                .info(apiInfo());
-    }
-
-    private Info apiInfo() {
-        return new Info()
-                .title("Popolog Blog Service API 명세서")
-                .description("Specification")
-                .version("1.0.0");
+                .addServersItem(new Server().url("/"));
     }
 }
