@@ -1,13 +1,13 @@
-insert into `member_profile` (member_id, nickname, profile_pic_url, created_at, updated_at) values
-	(1, '최상위', null, now(), now()),
-	(2, '관리자1', null, now(), now()),
-	(3, '관리자2', null, now(), now()),
-	(4, '관리자3', null, now(), now()),
-	(5, '회원1', null, now(), now()),
-	(6, '회원2', 'https://culturabcs.gob.mx/defaults/profile.png', now(), now()),
-	(7, '회원3', 'https://culturabcs.gob.mx/defaults/profile.png', now(), now()),
-	(8, '회원4', null, now(), now()),
-	(9, '회원5', 'https://culturabcs.gob.mx/defaults/profile.png', now(), now());
+insert into `member_profile` (member_id, username, nickname, profile_pic_url, created_at, updated_at) values
+	(1, 'super', '최상위', null, now(), now()),
+	(2, 'admin1', '관리자1', null, now(), now()),
+	(3, 'admin2', '관리자2', null, now(), now()),
+	(4, 'admin3', '관리자3', null, now(), now()),
+	(5, 'member1', '회원1', null, now(), now()),
+	(6, 'member2', '회원2', 'https://culturabcs.gob.mx/defaults/profile.png', now(), now()),
+	(7, 'member3', '회원3', 'https://culturabcs.gob.mx/defaults/profile.png', now(), now()),
+	(8, 'member4', '회원4', null, now(), now()),
+	(9, 'member5', '회원5', 'https://culturabcs.gob.mx/defaults/profile.png', now(), now());
 
 insert into `post` (post_id, member_id, title, content, is_blinded, created_at, updated_at) values
 	(1, 5, 'Aperiam eos in repellendus doloremque.', 'Iusto magni nemo quisquam iusto. Nulla dicta libero.', false, now(), now()),
