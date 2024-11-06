@@ -30,10 +30,6 @@ public class Post extends BaseEntity {
 	@Column(name = "content", nullable = false, columnDefinition = "text")
 	private String content;
 
-	// 섬네일 주소
-	@Column(name = "thumbnail_url")
-	private String thumbnailUrl;
-
 	@Column(name = "is_blinded", nullable = false)
 	private Boolean isBlinded;
 
@@ -49,11 +45,10 @@ public class Post extends BaseEntity {
 	//***** cascade 설정 끝 *****//
 
 	@Builder
-	public Post(MemberProfile memberProfile, String title, String content, String thumbnailUrl, Boolean isBlinded) {
+	public Post(MemberProfile memberProfile, String title, String content, Boolean isBlinded) {
 		this.memberProfile = memberProfile;
 		this.title = title;
 		this.content = content;
-		this.thumbnailUrl = thumbnailUrl;
 		this.isBlinded = isBlinded;
 	}
 }

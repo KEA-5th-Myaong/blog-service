@@ -43,7 +43,6 @@ public class PostsService {
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.thumbnailUrl(p.getThumbnailUrl())
 					.content(p.getContent())
 					.timestamp(p.getCreatedAt())
 					.memberId(p.getMemberProfile().getId())
