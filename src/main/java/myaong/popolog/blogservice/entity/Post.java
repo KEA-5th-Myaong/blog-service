@@ -22,7 +22,7 @@ public class Post extends BaseEntity {
 	// 작성자 정보
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
-	private MemberProfile memberProfile;
+	private Profile profile;
 
 	@Column(name = "title", nullable = false)
 	private String title;
@@ -45,8 +45,8 @@ public class Post extends BaseEntity {
 	//***** cascade 설정 끝 *****//
 
 	@Builder
-	public Post(MemberProfile memberProfile, String title, String content, Boolean isBlinded) {
-		this.memberProfile = memberProfile;
+	public Post(Profile profile, String title, String content, Boolean isBlinded) {
+		this.profile = profile;
 		this.title = title;
 		this.content = content;
 		this.isBlinded = isBlinded;

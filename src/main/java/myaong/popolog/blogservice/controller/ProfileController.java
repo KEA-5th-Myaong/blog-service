@@ -22,19 +22,19 @@ public class ProfileController {
 
 	@Operation(summary = "API 명세서 v0.3 line 23", description = "팔로우 토글(팔로우 시 알림 발송 기능은 아직 미구현)")
 	@PostMapping("/{memberId}/follow")
-	public ApiResponse<ProfileResponse.FollowDTO> followMember(@PathVariable(required = false) Long memberId) {
-		return ApiResponse.onSuccess(profileCommandService.followMember(memberId));
+	public ApiResponse<ProfileResponse.FollowDTO> followProfile(@PathVariable(required = false) Long memberId) {
+		return ApiResponse.onSuccess(profileCommandService.followProfile(memberId));
 	}
 
 	@Operation(summary = "API 명세서 v0.3 line 24", description = "팔로잉 조회 (무한 스크롤)")
 	@GetMapping("/{memberId}/following/{lastId}")
-	public ApiResponse<ProfileResponse.FollowingListDTO> getMemberFollowingList(@PathVariable(required = false) Long memberId, @PathVariable(required = false) Long lastId) {
-		return ApiResponse.onSuccess(profileQueryService.getMemberFollowingList(memberId, lastId));
+	public ApiResponse<ProfileResponse.FollowingListDTO> getProfileFollowingList(@PathVariable(required = false) Long memberId, @PathVariable(required = false) Long lastId) {
+		return ApiResponse.onSuccess(profileQueryService.getProfileFollowingList(memberId, lastId));
 	}
 
 	@Operation(summary = "API 명세서 v0.3 line 25", description = "팔로워 조회 (무한 스크롤)")
 	@GetMapping("/{memberId}/followed/{lastId}")
-	public ApiResponse<ProfileResponse.FollowedListDTO> getMemberFollowedList(@PathVariable(required = false) Long memberId, @PathVariable(required = false) Long lastId) {
-		return ApiResponse.onSuccess(profileQueryService.getMemberFollowedList(memberId, lastId));
+	public ApiResponse<ProfileResponse.FollowedListDTO> getProfileFollowedList(@PathVariable(required = false) Long memberId, @PathVariable(required = false) Long lastId) {
+		return ApiResponse.onSuccess(profileQueryService.getProfileFollowedList(memberId, lastId));
 	}
 }

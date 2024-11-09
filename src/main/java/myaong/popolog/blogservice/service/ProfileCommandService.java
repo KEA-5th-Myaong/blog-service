@@ -4,5 +4,5 @@ import myaong.popolog.blogservice.dto.response.ProfileResponse;
 
 public interface ProfileCommandService {
 
-	ProfileResponse.FollowDTO followMember(Long memberId);
+	ProfileResponse.FollowDTO followProfile(Long memberId);
 }

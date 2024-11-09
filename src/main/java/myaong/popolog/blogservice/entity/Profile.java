@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "`member_profile`")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberProfile extends BaseEntity {
+public class Profile extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,7 +48,7 @@ public class MemberProfile extends BaseEntity {
 	private List<Follow> followers = new ArrayList<>();
 
 	@Builder
-	public MemberProfile(String username, String name, String nickname, String profilePicUrl, String blogIntro) {
+	public Profile(String username, String name, String nickname, String profilePicUrl, String blogIntro) {
 		this.username = username;
 		this.name = name;
 		this.nickname = nickname;
