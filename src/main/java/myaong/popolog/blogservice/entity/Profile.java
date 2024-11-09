@@ -56,7 +56,8 @@ public class Profile extends BaseEntity {
 	private List<Report> reports = new ArrayList<>();
 
 	@Builder
-	public Profile(String username, String name, String nickname, String profilePicUrl, String blogIntro) {
+	public Profile(Long id, String username, String name, String nickname, String profilePicUrl, String blogIntro) {
+		this.id = id;
 		this.username = username;
 		this.name = name;
 		this.nickname = nickname;
