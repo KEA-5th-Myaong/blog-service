@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class MemberPrejob extends BaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_prejob_id")
 	private Long id;
 

@@ -16,7 +16,6 @@ import java.util.List;
 public class Profile extends BaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
 	private Long id;
 
