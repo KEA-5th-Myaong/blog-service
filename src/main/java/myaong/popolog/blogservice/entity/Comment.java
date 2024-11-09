@@ -40,7 +40,7 @@ public class Comment extends BaseEntity {
 	@Column(name = "is_blinded", nullable = false)
 	private Boolean isBlinded;
 
-	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> replies;
 
 	@Builder
