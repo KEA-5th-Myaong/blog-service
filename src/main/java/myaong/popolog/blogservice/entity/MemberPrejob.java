@@ -29,7 +29,8 @@ public class MemberPrejob extends BaseEntity {
 	private String jobName;
 
 	@Builder
-	public MemberPrejob(Long memberId, Long jobId, String jobName) {
+	public MemberPrejob(Long id, Long memberId, Long jobId, String jobName) {
+		this.id = id;
 		this.memberId = memberId;
 		this.jobId = jobId;
 		this.jobName = jobName;
