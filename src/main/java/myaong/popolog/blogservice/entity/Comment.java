@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "`comment`")
 @Getter
@@ -37,6 +39,9 @@ public class Comment extends BaseEntity {
 
 	@Column(name = "is_blinded", nullable = false)
 	private Boolean isBlinded;
+
+	@OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> replies;
 
 	@Builder
 	public Comment(Post post, Profile profile, Comment parentComment, String content, Boolean isBlinded) {
