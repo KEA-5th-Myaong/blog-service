@@ -12,5 +12,4 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
 	List<Post> findTop10ByOrderByIdDesc();
-	Optional<Post> findById(@Param("postId") Long postId);
 }
