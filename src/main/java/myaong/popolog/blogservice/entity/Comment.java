@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "`comment`")
 @Getter
@@ -25,7 +27,7 @@ public class Comment extends BaseEntity {
 	// 댓글 작성자. 작성자 탈퇴 시 null
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", updatable = false)
-	private MemberProfile memberProfile;
+	private Profile profile;
 
 	// 답글인 경우, 본 답글이 달린 댓글. 댓글인 경우 null
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -38,10 +40,13 @@ public class Comment extends BaseEntity {
 	@Column(name = "is_blinded", nullable = false)
 	private Boolean isBlinded;
 
+	@OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> replies;
+
 	@Builder
-	public Comment(Post post, MemberProfile memberProfile, Comment parentComment, String content, Boolean isBlinded) {
+	public Comment(Post post, Profile profile, Comment parentComment, String content, Boolean isBlinded) {
 		this.post = post;
-		this.memberProfile = memberProfile;
+		this.profile = profile;
 		this.parentComment = parentComment;
 		this.content = content;
 		this.isBlinded = isBlinded;

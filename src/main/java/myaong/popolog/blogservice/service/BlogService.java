@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
-import myaong.popolog.blogservice.repository.CommentRepository;
 import myaong.popolog.blogservice.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,13 +38,12 @@ public class BlogService {
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.thumbnailUrl(p.getThumbnailUrl())
 					.content(p.getContent())
 					.timestamp(p.getCreatedAt())
-					.memberId(p.getMemberProfile().getId())
-					.username(p.getMemberProfile().getUsername())
-					.nickname(p.getMemberProfile().getNickname())
-					.profilePicUrl(p.getMemberProfile().getProfilePicUrl())
+					.memberId(p.getProfile().getId())
+					.username(p.getProfile().getUsername())
+					.nickname(p.getProfile().getNickname())
+					.profilePicUrl(p.getProfile().getProfilePicUrl())
 					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
 					.build();
 			posts.add(post);
@@ -77,13 +75,12 @@ public class BlogService {
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.thumbnailUrl(p.getThumbnailUrl())
 					.content(p.getContent())
 					.timestamp(p.getCreatedAt())
-					.memberId(p.getMemberProfile().getId())
-					.username(p.getMemberProfile().getUsername())
-					.nickname(p.getMemberProfile().getNickname())
-					.profilePicUrl(p.getMemberProfile().getProfilePicUrl())
+					.memberId(p.getProfile().getId())
+					.username(p.getProfile().getUsername())
+					.nickname(p.getProfile().getNickname())
+					.profilePicUrl(p.getProfile().getProfilePicUrl())
 					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
 					.build();
 			posts.add(post);
@@ -115,13 +112,12 @@ public class BlogService {
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.thumbnailUrl(p.getThumbnailUrl())
 					.content(p.getContent())
 					.timestamp(p.getCreatedAt())
-					.memberId(p.getMemberProfile().getId())
-					.username(p.getMemberProfile().getUsername())
-					.nickname(p.getMemberProfile().getNickname())
-					.profilePicUrl(p.getMemberProfile().getProfilePicUrl())
+					.memberId(p.getProfile().getId())
+					.username(p.getProfile().getUsername())
+					.nickname(p.getProfile().getNickname())
+					.profilePicUrl(p.getProfile().getProfilePicUrl())
 					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
 					.build();
 			posts.add(post);
@@ -153,13 +149,12 @@ public class BlogService {
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.thumbnailUrl(p.getThumbnailUrl())
 					.content(p.getContent())
 					.timestamp(p.getCreatedAt())
-					.memberId(p.getMemberProfile().getId())
-					.username(p.getMemberProfile().getUsername())
-					.nickname(p.getMemberProfile().getNickname())
-					.profilePicUrl(p.getMemberProfile().getProfilePicUrl())
+					.memberId(p.getProfile().getId())
+					.username(p.getProfile().getUsername())
+					.nickname(p.getProfile().getNickname())
+					.profilePicUrl(p.getProfile().getProfilePicUrl())
 					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
 					.build();
 			posts.add(post);
@@ -191,13 +186,12 @@ public class BlogService {
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.thumbnailUrl(p.getThumbnailUrl())
 					.content(p.getContent())
 					.timestamp(p.getCreatedAt())
-					.memberId(p.getMemberProfile().getId())
-					.username(p.getMemberProfile().getUsername())
-					.nickname(p.getMemberProfile().getNickname())
-					.profilePicUrl(p.getMemberProfile().getProfilePicUrl())
+					.memberId(p.getProfile().getId())
+					.username(p.getProfile().getUsername())
+					.nickname(p.getProfile().getNickname())
+					.profilePicUrl(p.getProfile().getProfilePicUrl())
 					.isBookmarked(true)
 					.build();
 			posts.add(post);

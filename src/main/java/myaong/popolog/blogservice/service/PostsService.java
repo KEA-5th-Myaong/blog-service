@@ -43,13 +43,12 @@ public class PostsService {
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.thumbnailUrl(p.getThumbnailUrl())
 					.content(p.getContent())
 					.timestamp(p.getCreatedAt())
-					.memberId(p.getMemberProfile().getId())
-					.username(p.getMemberProfile().getUsername())
-					.nickname(p.getMemberProfile().getNickname())
-					.profilePicUrl(p.getMemberProfile().getProfilePicUrl())
+					.memberId(p.getProfile().getId())
+					.username(p.getProfile().getUsername())
+					.nickname(p.getProfile().getNickname())
+					.profilePicUrl(p.getProfile().getProfilePicUrl())
 					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
 					.build();
 			posts.add(post);

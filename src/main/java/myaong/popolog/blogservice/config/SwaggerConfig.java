@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(title = "Popolog Blog Service API Document", description = "Popolog Member Service 명세서", version = "v0.3")
+        info = @Info(title = "Popolog Blog Service API Document", description = "Popolog Profile Service 명세서", version = "v0.3")
 )
 public class SwaggerConfig {
     @Bean

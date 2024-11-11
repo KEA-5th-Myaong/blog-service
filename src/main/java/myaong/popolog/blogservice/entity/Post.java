@@ -22,17 +22,13 @@ public class Post extends BaseEntity {
 	// 작성자 정보
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
-	private MemberProfile memberProfile;
+	private Profile profile;
 
 	@Column(name = "title", nullable = false)
 	private String title;
 
 	@Column(name = "content", nullable = false, columnDefinition = "text")
 	private String content;
-
-	// 섬네일 주소
-	@Column(name = "thumbnail_url")
-	private String thumbnailUrl;
 
 	@Column(name = "is_blinded", nullable = false)
 	private Boolean isBlinded;
@@ -49,11 +45,10 @@ public class Post extends BaseEntity {
 	//***** cascade 설정 끝 *****//
 
 	@Builder
-	public Post(MemberProfile memberProfile, String title, String content, String thumbnailUrl, Boolean isBlinded) {
-		this.memberProfile = memberProfile;
+	public Post(Profile profile, String title, String content, Boolean isBlinded) {
+		this.profile = profile;
 		this.title = title;
 		this.content = content;
-		this.thumbnailUrl = thumbnailUrl;
 		this.isBlinded = isBlinded;
 	}
 }

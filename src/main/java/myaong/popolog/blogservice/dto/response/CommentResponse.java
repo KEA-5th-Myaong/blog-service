@@ -20,9 +20,9 @@ public class CommentResponse {
 
     public static CommentResponse of(Comment comment) {
         return CommentResponse.builder()
-                .profilePicUrl(comment.getMemberProfile() != null ? comment.getMemberProfile().getProfilePicUrl() : null)
-                .memberId(comment.getMemberProfile() != null ? comment.getMemberProfile().getId() : null)
-                .nickname(comment.getMemberProfile() != null ? comment.getMemberProfile().getNickname() : null)
+                .profilePicUrl(comment.getProfile() != null ? comment.getProfile().getProfilePicUrl() : null)
+                .memberId(comment.getProfile() != null ? comment.getProfile().getId() : null)
+                .nickname(comment.getProfile() != null ? comment.getProfile().getNickname() : null)
                 .commentId(comment.getId())
                 .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .comment(comment.getContent())
