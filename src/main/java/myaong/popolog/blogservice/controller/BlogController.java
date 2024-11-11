@@ -3,8 +3,10 @@ package myaong.popolog.blogservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
+import myaong.popolog.blogservice.dto.response.MainPageResponse;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.service.BlogService;
+import myaong.popolog.blogservice.service.MainPageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +18,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BlogController {
 
+	private final MainPageService mainPageService;
 	private final BlogService blogService;
 
-	@Operation(summary = "API 명세서 v0.3 line 31", description = "최신 포스트 조회")
+	@Operation(summary = "API 명세서 v0.4 line 25", description = "최신 포스트 조회")
 	@GetMapping("/recent/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getRecent(@PathVariable Long lastId) {
+	public ResponseEntity<ApiResponse<MainPageResponse>> getRecent(@PathVariable Long lastId) {
 
-		PostsResponse res = blogService.getRecent(5L, lastId);
+		MainPageResponse res = mainPageService.getRecentPosts(lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
