@@ -40,6 +40,11 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"   // Q 클래스 생성
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"   // JPA 지원
+
     // Swagger(Spring 3.x.x 이상부터 SpringFox 대신, SpringDoc)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
@@ -56,6 +61,17 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
+/**** QueryDSL config start ****/
+def querydslSrcDir = 'src/main/generated'
+
+clean {
+    delete file(querydslSrcDir)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.generatedSourceOutputDirectory = file(querydslSrcDir)
+} /**** QueryDSL config end ****/
 
 dependencyManagement {
     imports {
