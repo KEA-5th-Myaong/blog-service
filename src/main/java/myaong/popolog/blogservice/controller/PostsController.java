@@ -21,7 +21,7 @@ public class PostsController {
 	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(@PathVariable String memberId,
 																 @PathVariable Long lastId) {
 
-		PostsResponse res = postsService.getPostsOf(5L, lastId);
+		PostsResponse res = postsService.getPostsOf(lastId, 5L);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}

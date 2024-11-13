@@ -17,9 +17,9 @@ public class MemberPrejob extends BaseEntity {
 	@Column(name = "member_prejob_id")
 	private Long id;
 
-	// 회원 아이디
-	@Column(name = "member_id", nullable = false, updatable = false)
-	private Long memberId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id", nullable = false, updatable = false)
+	private Profile profile;
 
 	// 직군 아이디
 	@Column(name = "job_id", nullable = false, updatable = false)
@@ -29,9 +29,9 @@ public class MemberPrejob extends BaseEntity {
 	private String jobName;
 
 	@Builder
-	public MemberPrejob(Long id, Long memberId, Long jobId, String jobName) {
+	public MemberPrejob(Long id, Profile profile, Long jobId, String jobName) {
 		this.id = id;
-		this.memberId = memberId;
+		this.profile = profile;
 		this.jobId = jobId;
 		this.jobName = jobName;
 	}

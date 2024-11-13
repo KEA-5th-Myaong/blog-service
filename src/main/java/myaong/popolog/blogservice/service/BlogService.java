@@ -3,6 +3,7 @@ package myaong.popolog.blogservice.service;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Post;
+import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
 import myaong.popolog.blogservice.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class BlogService {
 					.username(p.getProfile().getUsername())
 					.nickname(p.getProfile().getNickname())
 					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
+					.isBookmarked(bookmarkRepository.existsByIdAndProfile(postId, new Profile(memberId, "", "", "", "", "")))
 					.build();
 			posts.add(post);
 		}
@@ -81,7 +82,7 @@ public class BlogService {
 					.username(p.getProfile().getUsername())
 					.nickname(p.getProfile().getNickname())
 					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
+					.isBookmarked(bookmarkRepository.existsByIdAndProfile(postId, new Profile(memberId, "", "", "", "", "")))
 					.build();
 			posts.add(post);
 		}
@@ -118,7 +119,7 @@ public class BlogService {
 					.username(p.getProfile().getUsername())
 					.nickname(p.getProfile().getNickname())
 					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
+					.isBookmarked(bookmarkRepository.existsByIdAndProfile(postId, new Profile(memberId, "", "", "", "", "")))
 					.build();
 			posts.add(post);
 		}
@@ -155,7 +156,7 @@ public class BlogService {
 					.username(p.getProfile().getUsername())
 					.nickname(p.getProfile().getNickname())
 					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
+					.isBookmarked(bookmarkRepository.existsByIdAndProfile(postId, new Profile(memberId, "", "", "", "", "")))
 					.build();
 			posts.add(post);
 		}

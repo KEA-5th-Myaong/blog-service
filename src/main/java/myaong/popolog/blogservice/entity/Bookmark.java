@@ -19,18 +19,19 @@ public class Bookmark extends BaseEntity {
 	@Column(name = "bookmark_id")
 	private Long id;
 
-	// 북마크한 회원 => 회원 정보 자체를 쓸 일은 없음(중복만 확인)
-	@Column(name = "member_id", updatable = false)
-	private Long memberId;
+	// 북마크한 회원
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id", nullable = false, updatable = false)
+	private Profile profile;
 
 	// 대상 포스트
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", updatable = false)
+	@JoinColumn(name = "post_id", nullable = false, updatable = false)
 	private Post post;
 
 	@Builder
-	public Bookmark(Long memberId, Post post) {
-		this.memberId = memberId;
+	public Bookmark(Profile profile, Post post) {
+		this.profile = profile;
 		this.post = post;
 	}
 }

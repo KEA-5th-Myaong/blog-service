@@ -20,21 +20,22 @@ public class Report extends BaseEntity {
 	private Long id;
 
 	// 신고한 회원
-	@Column(name = "member_id", nullable = false)
-	private Long memberId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id", nullable = false, updatable = false)
+	private Profile profile;
 
 	// 대상 콘텐츠
-	@Column(name = "contents_id", nullable = false)
+	@Column(name = "contents_id", nullable = false, updatable = false)
 	private Long contentsId;
 
 	// 콘텐츠 타입
 	@Enumerated(EnumType.STRING)
-	@Column(name = "contents_type", nullable = false)
+	@Column(name = "contents_type", nullable = false, updatable = false)
 	private ContentsType contentsType;
 
 	@Builder
-	public Report(Long memberId, Long contentsId, ContentsType contentsType) {
-		this.memberId = memberId;
+	public Report(Profile profile, Long contentsId, ContentsType contentsType) {
+		this.profile = profile;
 		this.contentsId = contentsId;
 		this.contentsType = contentsType;
 	}

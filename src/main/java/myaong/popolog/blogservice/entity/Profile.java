@@ -49,13 +49,13 @@ public class Profile extends BaseEntity {
 	@OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Post> posts = new ArrayList<>();
 
-	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bookmark> bookmarks = new ArrayList<>();
 
-	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Report> reports = new ArrayList<>();
 
-	@OneToMany(mappedBy = "memberId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MemberPrejob> prejobs = new ArrayList<>();
 
 	@Builder
