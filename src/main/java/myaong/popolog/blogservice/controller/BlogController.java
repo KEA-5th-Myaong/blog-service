@@ -30,24 +30,15 @@ public class BlogController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
-	@Operation(summary = "API 명세서 v0.3 line 35", description = "포스트 검색")
-	@GetMapping("/search/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getSearch(@RequestParam(name = "search") String search,
-																@PathVariable Long lastId) {
-
-		PostsResponse res = blogService.search(5L, search, lastId);
-
-		return ResponseEntity.ok(ApiResponse.onSuccess(res));
-	}
-
 	@Operation(summary = "API 명세서 v0.3 line 32", description = "추천 포스트 조회")
 	@GetMapping("/recommend/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getRecommend(@RequestParam("preJob") String rawPreJob,
+	public ResponseEntity<ApiResponse<MainPageResponse>> getRecommend(@RequestHeader("memberId") Long memberId,
+																   @RequestParam("preJob") String rawPreJob,
 																   @PathVariable Long lastId) {
 
-		List<Long> preJob = Arrays.stream(rawPreJob.split(",")).map(Long::valueOf).toList();
+		List<Long> preJobs = Arrays.stream(rawPreJob.split(",")).map(Long::valueOf).toList();
 
-		PostsResponse res = blogService.getRecommend(5L, preJob, lastId);
+		MainPageResponse res = mainPageService.getRecommendPosts(memberId, preJobs, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
@@ -66,6 +57,16 @@ public class BlogController {
 	public ResponseEntity<ApiResponse<PostsResponse>> getBookmark(@PathVariable Long lastId) {
 
 		PostsResponse res = blogService.getBookmark(5L, lastId);
+
+		return ResponseEntity.ok(ApiResponse.onSuccess(res));
+	}
+
+	@Operation(summary = "API 명세서 v0.3 line 35", description = "포스트 검색")
+	@GetMapping("/search/{lastId}")
+	public ResponseEntity<ApiResponse<PostsResponse>> getSearch(@RequestParam(name = "search") String search,
+																@PathVariable Long lastId) {
+
+		PostsResponse res = blogService.search(5L, search, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}

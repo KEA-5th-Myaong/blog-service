@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long>, QPostRepository {
 
 	List<Post> findTop10ByOrderByIdDesc();
 	List<Post> findTop10ByIdLessThanOrderByIdDesc(Long lastId);
