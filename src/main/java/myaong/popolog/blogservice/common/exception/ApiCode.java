@@ -22,9 +22,6 @@ public enum ApiCode {
 
 	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT_4040", "존재하지 않는 댓글입니다."),
 
-	MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MESSAGE_4040", "존재하지 않는 메시지입니다."),
-	MESSAGE_STATE_CONFLICT(HttpStatus.CONFLICT, "MESSAGE_4090", "Message already replied, cannot edit."),
-
 	REPORT_DUPLICATED(HttpStatus.CONFLICT, "REPORT_4090", "이미 신고한 콘텐츠입니다."),
 	;
 
