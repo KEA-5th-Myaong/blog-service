@@ -1,5 +1,8 @@
 package myaong.popolog.blogservice.common.exception;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,10 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -42,6 +42,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			Map<String, String> error = new HashMap<>();
 			error.put("field", fieldError.getField());
 			error.put("message", fieldError.getDefaultMessage());
+
+			errors.add(error);
+		}
+
+		return handleExceptionInternal(ApiCode.INVALID_DATA, errors);
+	}
+
+	// @Validated 검증 예외 처리
+	@ExceptionHandler
+	protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+
+		Set<ConstraintViolation<?>> fieldErrors = ex.getConstraintViolations();
+
+		List<Map<String, String>> errors = new ArrayList<>();
+		for (ConstraintViolation<?> fieldError : fieldErrors) {
+			Map<String, String> error = new HashMap<>();
+
+			String field = null;
+			for (Path.Node node : fieldError.getPropertyPath()) {
+				field = node.getName();
+			}
+			error.put("field", field);
+			error.put("message", fieldError.getMessage());
 
 			errors.add(error);
 		}
