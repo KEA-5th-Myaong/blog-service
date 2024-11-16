@@ -1,5 +1,6 @@
 package myaong.popolog.blogservice.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static myaong.popolog.blogservice.entity.QBookmark.bookmark;
 import static myaong.popolog.blogservice.entity.QPrejob.prejob;
 import static myaong.popolog.blogservice.entity.QPost.post;
 
@@ -50,6 +52,34 @@ public class QPostRepositoryImpl implements QPostRepository {
 						.where(prejob.profile.eq(member).and(reqPrejob.profile.eq(post.profile)).and(post.profile.ne(member)).and(post.id.lt(lastId)))
 						.exists())
 				.orderBy(post.id.desc())
+				.limit(10)
+				.fetch();
+	}
+
+	@Override
+	public List<Tuple> findByProfile_Bookmark(Profile member) {
+
+		return jpaQueryFactory
+				.select(post, bookmark.id)
+				.from(post)
+				.join(bookmark)
+				.on(post.id.eq(bookmark.post.id))
+				.where(bookmark.profile.eq(member))
+				.orderBy(bookmark.id.desc())
+				.limit(10)
+				.fetch();
+	}
+
+	@Override
+	public List<Tuple> findByProfile_Bookmark(Profile member, Long lastId) {
+
+		return jpaQueryFactory
+				.select(post, bookmark.id)
+				.from(post)
+				.join(bookmark)
+				.on(post.id.eq(bookmark.post.id))
+				.where(bookmark.profile.eq(member).and(bookmark.id.lt(lastId)))
+				.orderBy(bookmark.id.desc())
 				.limit(10)
 				.fetch();
 	}

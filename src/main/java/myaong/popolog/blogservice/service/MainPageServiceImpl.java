@@ -1,5 +1,6 @@
 package myaong.popolog.blogservice.service;
 
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
@@ -55,5 +56,20 @@ public class MainPageServiceImpl implements MainPageService {
 		}
 
 		return mainPageConverter.toMainPageResponse(postList, member);
+	}
+
+	@Override
+	public MainPageResponse getBookmarkedPosts(Long memberId, Long lastId) {
+
+		Profile member = profileQueryService.findProfileByMemberId(memberId);
+
+		List<Tuple> tupleList;
+		if (lastId.equals(0L)) {
+			tupleList = postRepository.findByProfile_Bookmark(member);
+		} else {
+			tupleList = postRepository.findByProfile_Bookmark(member, lastId);
+		}
+
+		return mainPageConverter.toMainPageResponseBookmarked(tupleList);
 	}
 }

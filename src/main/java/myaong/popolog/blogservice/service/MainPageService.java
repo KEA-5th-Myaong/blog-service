@@ -7,5 +7,8 @@ import java.util.List;
 public interface MainPageService {
 
 	MainPageResponse getRecentPosts(Long lastId);
+
 	MainPageResponse getRecommendPosts(Long memberId, List<Long> preJobs, Long lastId);
+
+	MainPageResponse getBookmarkedPosts(Long memberId, Long lastId);
 }

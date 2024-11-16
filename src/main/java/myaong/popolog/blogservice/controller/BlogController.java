@@ -53,11 +53,12 @@ public class BlogController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
-	@Operation(summary = "API 명세서 v0.3 line 34", description = "북마크 포스트 조회")
+	@Operation(summary = "API 명세서 v0.4 line 28", description = "북마크 포스트 조회")
 	@GetMapping("/bookmark/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getBookmark(@PathVariable Long lastId) {
+	public ResponseEntity<ApiResponse<MainPageResponse>> getBookmark(@RequestHeader("memberId") Long memberId,
+																	 @PathVariable @PositiveOrZero(message = "lastId는 0 이상이어야 합니다.") Long lastId) {
 
-		PostsResponse res = blogService.getBookmark(5L, lastId);
+		MainPageResponse res = mainPageService.getBookmarkedPosts(memberId, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
