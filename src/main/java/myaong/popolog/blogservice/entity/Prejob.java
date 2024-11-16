@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 		uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "job_id"})})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberPrejob extends BaseEntity {
+public class Prejob extends BaseEntity {
 
 	@Id
 	@Column(name = "member_prejob_id")
@@ -29,7 +29,7 @@ public class MemberPrejob extends BaseEntity {
 	private String jobName;
 
 	@Builder
-	public MemberPrejob(Long id, Profile profile, Long jobId, String jobName) {
+	public Prejob(Long id, Profile profile, Long jobId, String jobName) {
 		this.id = id;
 		this.profile = profile;
 		this.jobId = jobId;

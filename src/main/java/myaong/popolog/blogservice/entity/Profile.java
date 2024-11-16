@@ -56,7 +56,7 @@ public class Profile extends BaseEntity {
 	private List<Report> reports = new ArrayList<>();
 
 	@OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<MemberPrejob> prejobs = new ArrayList<>();
+	private List<Prejob> prejobs = new ArrayList<>();
 
 	@Builder
 	public Profile(Long id, String username, String name, String nickname, String profilePicUrl, String blogIntro) {
