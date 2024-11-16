@@ -70,7 +70,7 @@ public class MainPageServiceImpl implements MainPageService {
 			postList = postRepository.findByFollowing(member, lastId);
 		}
 
-		return mainPageConverter.toMainPageResponse(postList);
+		return mainPageConverter.toMainPageResponse(postList, member);
 	}
 
 	@Override

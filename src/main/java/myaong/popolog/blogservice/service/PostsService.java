@@ -50,7 +50,7 @@ public class PostsService {
 					.username(p.getProfile().getUsername())
 					.nickname(p.getProfile().getNickname())
 					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkRepository.existsByIdAndProfile(postId, new Profile(memberId, "", "", "", "", "")))
+					.isBookmarked(bookmarkRepository.existsByPostAndProfile(p, new Profile(memberId, "", "", "", "", "")))
 					.build();
 			posts.add(post);
 		}
@@ -70,7 +70,7 @@ public class PostsService {
 
 		List<Comment> comments = commentRepository.findByPostId(postId);
 
-		boolean isBookmarked = bookmarkRepository.existsByIdAndProfile(postId, new Profile(1L, "", "", "", "", ""));
+		boolean isBookmarked = bookmarkRepository.existsByPostAndProfile(post, new Profile(1L, "", "", "", "", ""));
 
 		return PostDetailResponse.of(post, comments, isBookmarked);
 	}

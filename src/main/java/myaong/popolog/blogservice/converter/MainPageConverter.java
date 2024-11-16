@@ -28,7 +28,6 @@ public class MainPageConverter {
 		for (Post p : postList) {
 
 			Long postId = p.getId();
-
 			if (postId.compareTo(minId) < 0) {
 				minId = postId;
 			}
@@ -53,13 +52,12 @@ public class MainPageConverter {
 		for (Post p : postList) {
 
 			Long postId = p.getId();
-
 			if (postId.compareTo(minId) < 0) {
 				minId = postId;
 			}
 
 			MainPageResponse.PostDTO post
-					= toMainPageResponse_Post(p, bookmarkService.existsByProfileAndBookmarkId(postId, profile));
+					= toMainPageResponse_Post(p, bookmarkService.existsByPostAndProfile(p, profile));
 			posts.add(post);
 		}
 
