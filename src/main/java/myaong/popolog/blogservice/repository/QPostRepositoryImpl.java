@@ -8,6 +8,7 @@ import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.entity.QPrejob;
+import myaong.popolog.blogservice.service.ProfileQueryService;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import static myaong.popolog.blogservice.entity.QPost.post;
 public class QPostRepositoryImpl implements QPostRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
+	private final ProfileQueryService profileQueryService;
 
 	@Override
 	public List<Post> findByPrejobExcludingProfile(Profile member, List<Long> preJobs) {
@@ -32,7 +34,9 @@ public class QPostRepositoryImpl implements QPostRepository {
 				.where(JPAExpressions.selectOne()
 						.from(prejob)
 						.join(reqPrejob).on(reqPrejob.jobId.eq(prejob.jobId))
-						.where(prejob.profile.eq(member).and(reqPrejob.profile.eq(post.profile)).and(post.profile.ne(member)))
+						.where(prejob.profile.eq(member),
+								reqPrejob.profile.eq(post.profile),
+								post.profile.ne(member))
 						.exists())
 				.orderBy(post.id.desc())
 				.limit(10)
@@ -50,7 +54,10 @@ public class QPostRepositoryImpl implements QPostRepository {
 						.from(prejob)
 						.join(reqPrejob)
 						.on(reqPrejob.jobId.eq(prejob.jobId))
-						.where(prejob.profile.eq(member).and(reqPrejob.profile.eq(post.profile)).and(post.profile.ne(member)).and(post.id.lt(lastId)))
+						.where(prejob.profile.eq(member),
+								reqPrejob.profile.eq(post.profile),
+								post.profile.ne(member),
+								post.id.lt(lastId))
 						.exists())
 				.orderBy(post.id.desc())
 				.limit(10)
@@ -62,7 +69,7 @@ public class QPostRepositoryImpl implements QPostRepository {
 
 		return jpaQueryFactory
 				.selectFrom(post)
-				.where(post.profile.in(member.getFollowings().stream().map(Follow::getFollowed).toList()))
+				.where(post.profile.in(profileQueryService.findFollowingOf(member)))
 				.orderBy(post.id.desc())
 				.limit(10)
 				.fetch();
@@ -73,7 +80,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 
 		return jpaQueryFactory
 				.selectFrom(post)
-				.where(post.profile.in(member.getFollowings().stream().map(Follow::getFollowed).toList()).and(post.id.lt(lastId)))
+				.where(post.profile.in(profileQueryService.findFollowingOf(member)),
+						post.id.lt(lastId))
 				.orderBy(post.id.desc())
 				.limit(10)
 				.fetch();
@@ -101,7 +109,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 				.from(post)
 				.join(bookmark)
 				.on(post.id.eq(bookmark.post.id))
-				.where(bookmark.profile.eq(member).and(bookmark.id.lt(lastId)))
+				.where(bookmark.profile.eq(member),
+						bookmark.id.lt(lastId))
 				.orderBy(bookmark.id.desc())
 				.limit(10)
 				.fetch();

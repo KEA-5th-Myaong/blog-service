@@ -5,6 +5,7 @@ import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
+import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
@@ -49,5 +50,10 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 	public Profile findProfileByMemberId(Long memberId) {
 		return profileRepository.findById(memberId)
 				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public List<Profile> findFollowingOf(Profile member) {
+		return member.getFollowings().stream().map(Follow::getFollowed).toList();
 	}
 }
