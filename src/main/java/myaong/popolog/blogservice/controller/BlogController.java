@@ -44,11 +44,12 @@ public class BlogController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
-	@Operation(summary = "API 명세서 v0.3 line 33", description = "팔로잉 포스트 조회")
+	@Operation(summary = "API 명세서 v0.4 line 27", description = "팔로잉 포스트 조회")
 	@GetMapping("/following/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getFollowing(@PathVariable Long lastId) {
+	public ResponseEntity<ApiResponse<MainPageResponse>> getFollowing(@RequestHeader("memberId") Long memberId,
+																   @PathVariable @PositiveOrZero(message = "lastId는 0 이상이어야 합니다.") Long lastId) {
 
-		PostsResponse res = blogService.getFollowing(5L, lastId);
+		MainPageResponse res = mainPageService.getFollowingPosts(memberId, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}

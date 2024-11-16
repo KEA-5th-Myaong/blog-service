@@ -59,6 +59,21 @@ public class MainPageServiceImpl implements MainPageService {
 	}
 
 	@Override
+	public MainPageResponse getFollowingPosts(Long memberId, Long lastId) {
+
+		Profile member = profileQueryService.findProfileByMemberId(memberId);
+
+		List<Post> postList;
+		if (lastId.equals(0L)) {
+			postList = postRepository.findByFollowing(member);
+		} else {
+			postList = postRepository.findByFollowing(member, lastId);
+		}
+
+		return mainPageConverter.toMainPageResponse(postList);
+	}
+
+	@Override
 	public MainPageResponse getBookmarkedPosts(Long memberId, Long lastId) {
 
 		Profile member = profileQueryService.findProfileByMemberId(memberId);

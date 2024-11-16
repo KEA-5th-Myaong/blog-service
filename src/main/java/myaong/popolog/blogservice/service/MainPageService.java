@@ -10,5 +10,7 @@ public interface MainPageService {
 
 	MainPageResponse getRecommendPosts(Long memberId, List<Long> preJobs, Long lastId);
 
+	MainPageResponse getFollowingPosts(Long memberId, Long lastId);
+
 	MainPageResponse getBookmarkedPosts(Long memberId, Long lastId);
 }

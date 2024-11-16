@@ -4,6 +4,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.entity.QPrejob;
@@ -51,6 +52,28 @@ public class QPostRepositoryImpl implements QPostRepository {
 						.on(reqPrejob.jobId.eq(prejob.jobId))
 						.where(prejob.profile.eq(member).and(reqPrejob.profile.eq(post.profile)).and(post.profile.ne(member)).and(post.id.lt(lastId)))
 						.exists())
+				.orderBy(post.id.desc())
+				.limit(10)
+				.fetch();
+	}
+
+	@Override
+	public List<Post> findByFollowing(Profile member) {
+
+		return jpaQueryFactory
+				.selectFrom(post)
+				.where(post.profile.in(member.getFollowings().stream().map(Follow::getFollowed).toList()))
+				.orderBy(post.id.desc())
+				.limit(10)
+				.fetch();
+	}
+
+	@Override
+	public List<Post> findByFollowing(Profile member, Long lastId) {
+
+		return jpaQueryFactory
+				.selectFrom(post)
+				.where(post.profile.in(member.getFollowings().stream().map(Follow::getFollowed).toList()).and(post.id.lt(lastId)))
 				.orderBy(post.id.desc())
 				.limit(10)
 				.fetch();
