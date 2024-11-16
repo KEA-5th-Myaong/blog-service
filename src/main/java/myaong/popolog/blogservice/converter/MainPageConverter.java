@@ -18,7 +18,7 @@ public class MainPageConverter {
 
 	public MainPageResponse toMainPageResponse(List<Post> postList) {
 
-		List<MainPageResponse.Posts> posts = new ArrayList<>();
+		List<MainPageResponse.PostDTO> posts = new ArrayList<>();
 		long minId = Long.MAX_VALUE;
 
 		for (Post p : postList) {
@@ -28,17 +28,8 @@ public class MainPageConverter {
 			if (postId.compareTo(minId) < 0) {
 				minId = postId;
 			}
-			MainPageResponse.Posts post = MainPageResponse.Posts.builder()
-					.postId(postId)
-					.title(p.getTitle())
-					.content(p.getContent())
-					.timestamp(p.getCreatedAt())
-					.memberId(p.getProfile().getId())
-					.username(p.getProfile().getUsername())
-					.nickname(p.getProfile().getNickname())
-					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(false)
-					.build();
+
+			MainPageResponse.PostDTO post = toMainPageResponse_Post(p, false);
 			posts.add(post);
 		}
 
@@ -52,7 +43,7 @@ public class MainPageConverter {
 
 	public MainPageResponse toMainPageResponse(List<Post> postList, Profile profile) {
 
-		List<MainPageResponse.Posts> posts = new ArrayList<>();
+		List<MainPageResponse.PostDTO> posts = new ArrayList<>();
 		long minId = Long.MAX_VALUE;
 
 		for (Post p : postList) {
@@ -62,17 +53,9 @@ public class MainPageConverter {
 			if (postId.compareTo(minId) < 0) {
 				minId = postId;
 			}
-			MainPageResponse.Posts post = MainPageResponse.Posts.builder()
-					.postId(postId)
-					.title(p.getTitle())
-					.content(p.getContent())
-					.timestamp(p.getCreatedAt())
-					.memberId(p.getProfile().getId())
-					.username(p.getProfile().getUsername())
-					.nickname(p.getProfile().getNickname())
-					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkService.existsByProfileAndBookmarkId(postId, profile))
-					.build();
+
+			MainPageResponse.PostDTO post
+					= toMainPageResponse_Post(p, bookmarkService.existsByProfileAndBookmarkId(postId, profile));
 			posts.add(post);
 		}
 
@@ -82,5 +65,20 @@ public class MainPageConverter {
 		return MainPageResponse.builder()
 				.lastId(minId)
 				.posts(posts).build();
+	}
+
+	private MainPageResponse.PostDTO toMainPageResponse_Post(Post post, Boolean isBookmarked) {
+
+		return MainPageResponse.PostDTO.builder()
+				.postId(post.getId())
+				.title(post.getTitle())
+				.content(post.getContent())
+				.timestamp(post.getCreatedAt())
+				.memberId(post.getProfile().getId())
+				.username(post.getProfile().getUsername())
+				.nickname(post.getProfile().getNickname())
+				.profilePicUrl(post.getProfile().getProfilePicUrl())
+				.isBookmarked(isBookmarked)
+				.build();
 	}
 }

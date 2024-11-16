@@ -11,11 +11,11 @@ import java.util.List;
 public class MainPageResponse {
 
 	private Long lastId;
-	private List<Posts> posts;
+	private List<PostDTO> posts;
 
 	@Builder
 	@Getter
-	public static class Posts {
+	public static class PostDTO {
 		private Long postId;
 		private String title;
 		private String thumbnailUrl;
