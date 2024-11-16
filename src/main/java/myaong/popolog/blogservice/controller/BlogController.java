@@ -67,7 +67,7 @@ public class BlogController {
 																@PathVariable @PositiveOrZero(message = "lastId는 0 이상이어야 합니다.") Long lastId) {
 
 		//TODO: 검색 구현 필요 : mainPageService.search(search, lastId)
-		//- 검색 시에는 자기 포스트도 조회 가능
+		// - 검색 시에는 자기 포스트도 조회 가능
 		MainPageResponse res = mainPageService.getRecentPosts(lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));

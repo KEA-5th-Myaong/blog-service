@@ -4,7 +4,6 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.entity.QPrejob;
