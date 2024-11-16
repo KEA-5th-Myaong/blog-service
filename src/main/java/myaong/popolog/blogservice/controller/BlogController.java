@@ -6,8 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.response.MainPageResponse;
-import myaong.popolog.blogservice.dto.response.PostsResponse;
-import myaong.popolog.blogservice.service.BlogService;
 import myaong.popolog.blogservice.service.MainPageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +20,6 @@ import java.util.List;
 public class BlogController {
 
 	private final MainPageService mainPageService;
-	private final BlogService blogService;
 
 	@Operation(summary = "API 명세서 v0.4 line 25", description = "최신 포스트 조회")
 	@GetMapping("/recent/{lastId}")
@@ -64,12 +61,14 @@ public class BlogController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
-	@Operation(summary = "API 명세서 v0.3 line 35", description = "포스트 검색")
+	@Operation(summary = "API 명세서 v0.4 line 29", description = "포스트 검색")
 	@GetMapping("/search/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getSearch(@RequestParam(name = "search") String search,
-																@PathVariable Long lastId) {
+	public ResponseEntity<ApiResponse<MainPageResponse>> getSearch(@RequestParam(name = "search") String search,
+																@PathVariable @PositiveOrZero(message = "lastId는 0 이상이어야 합니다.") Long lastId) {
 
-		PostsResponse res = blogService.search(5L, search, lastId);
+		//TODO: 검색 구현 필요 : mainPageService.search(search, lastId)
+		//- 검색 시에는 자기 포스트도 조회 가능
+		MainPageResponse res = mainPageService.getRecentPosts(lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
