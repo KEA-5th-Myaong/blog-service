@@ -43,7 +43,7 @@ public class MainPageServiceImpl implements MainPageService {
 		Profile member = profileQueryService.findProfileByMemberId(memberId);
 
 		// 요청된 관심직군 중 사용자의 관심 직군이 아닌 것이 있는지 검증
-		List<Long> prejobsOfMember = member.getPrejobs().stream().map(Prejob::getId).toList();
+		List<Long> prejobsOfMember = member.getPrejobs().stream().map(Prejob::getJobId).toList();
 		preJobs.forEach((p) -> {
 			if (!prejobsOfMember.contains(p)) throw new ApiException(ApiCode.INVALID_PREJOBS);
 		});
