@@ -1,9 +1,12 @@
 package myaong.popolog.blogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.common.exception.ApiCode;
+import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.MainPageConverter;
 import myaong.popolog.blogservice.dto.response.MainPageResponse;
 import myaong.popolog.blogservice.entity.Post;
+import myaong.popolog.blogservice.entity.Prejob;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,12 @@ public class MainPageServiceImpl implements MainPageService {
 	public MainPageResponse getRecommendPosts(Long memberId, List<Long> preJobs, Long lastId) {
 
 		Profile member = profileQueryService.findProfileByMemberId(memberId);
+
+		// 요청된 관심직군 중 사용자의 관심 직군이 아닌 것이 있는지 검증
+		List<Long> prejobsOfMember = member.getPrejobs().stream().map(Prejob::getId).toList();
+		preJobs.forEach((p) -> {
+			if (!prejobsOfMember.contains(p)) throw new ApiException(ApiCode.INVALID_PREJOBS);
+		});
 
 		List<Post> postList;
 		if (lastId.equals(0L)) {
