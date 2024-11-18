@@ -7,6 +7,7 @@ import myaong.popolog.blogservice.dto.response.PostDetailResponse;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Comment;
 import myaong.popolog.blogservice.entity.Post;
+import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
 import myaong.popolog.blogservice.repository.CommentRepository;
 import myaong.popolog.blogservice.repository.PostRepository;
@@ -26,7 +27,7 @@ public class PostsService {
 	private final CommentRepository commentRepository;
 
 	@Transactional(readOnly = true)
-	public PostsResponse getPostsOf(long memberId, Long lastId) {
+	public PostsResponse getPostsOf(Long memberId, Long lastId) {
 
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
 
@@ -49,7 +50,7 @@ public class PostsService {
 					.username(p.getProfile().getUsername())
 					.nickname(p.getProfile().getNickname())
 					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkRepository.existsByIdAndMemberId(postId, memberId))
+					.isBookmarked(bookmarkRepository.existsByPostAndProfile(p, new Profile(memberId, "", "", "", "", "")))
 					.build();
 			posts.add(post);
 		}
@@ -69,7 +70,7 @@ public class PostsService {
 
 		List<Comment> comments = commentRepository.findByPostId(postId);
 
-		boolean isBookmarked = bookmarkRepository.existsByIdAndMemberId(postId, 5L);
+		boolean isBookmarked = bookmarkRepository.existsByPostAndProfile(post, new Profile(1L, "", "", "", "", ""));
 
 		return PostDetailResponse.of(post, comments, isBookmarked);
 	}

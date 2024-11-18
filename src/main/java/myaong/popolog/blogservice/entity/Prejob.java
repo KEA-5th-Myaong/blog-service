@@ -11,15 +11,15 @@ import lombok.NoArgsConstructor;
 		uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "job_id"})})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberPrejob extends BaseEntity {
+public class Prejob extends BaseEntity {
 
 	@Id
 	@Column(name = "member_prejob_id")
 	private Long id;
 
-	// 회원 아이디
-	@Column(name = "member_id", nullable = false, updatable = false)
-	private Long memberId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id", nullable = false, updatable = false)
+	private Profile profile;
 
 	// 직군 아이디
 	@Column(name = "job_id", nullable = false, updatable = false)
@@ -29,9 +29,9 @@ public class MemberPrejob extends BaseEntity {
 	private String jobName;
 
 	@Builder
-	public MemberPrejob(Long id, Long memberId, Long jobId, String jobName) {
+	public Prejob(Long id, Profile profile, Long jobId, String jobName) {
 		this.id = id;
-		this.memberId = memberId;
+		this.profile = profile;
 		this.jobId = jobId;
 		this.jobName = jobName;
 	}

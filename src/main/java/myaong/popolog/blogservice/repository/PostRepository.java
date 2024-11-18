@@ -2,13 +2,13 @@ package myaong.popolog.blogservice.repository;
 
 import myaong.popolog.blogservice.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
+@Repository
+public interface PostRepository extends JpaRepository<Post, Long>, QPostRepository {
 
 	List<Post> findTop10ByOrderByIdDesc();
-	Optional<Post> findById(@Param("postId") Long postId);
+	List<Post> findTop10ByIdLessThanOrderByIdDesc(Long lastId);
 }
