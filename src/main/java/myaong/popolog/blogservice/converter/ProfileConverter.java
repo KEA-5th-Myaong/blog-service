@@ -1,5 +1,6 @@
 package myaong.popolog.blogservice.converter;
 
+import myaong.popolog.blogservice.dto.request.NewProfileRequest;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;

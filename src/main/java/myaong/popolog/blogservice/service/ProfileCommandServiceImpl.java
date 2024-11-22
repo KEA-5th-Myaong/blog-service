@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
+import myaong.popolog.blogservice.dto.request.NewProfileRequest;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProfileCommandServiceImpl implements ProfileCommandService {
 
 	private final ProfileQueryService profileQueryService;
+	private final ProfileRepository profileRepository;
 	private final FollowRepository followRepository;
 	private final ProfileConverter profileConverter;
 
