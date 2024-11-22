@@ -83,4 +83,23 @@ public class ProfileConverter {
 				.blogIntro(String.format("%s의 블로그입니다.", request.getNickname()))
 				.build();
 	}
+
+	public ProfileResponse toProfileResponseByMemberId(Profile profile) {
+
+		return ProfileResponse.builder()
+				.name(profile.getName())
+				.nickname(profile.getNickname())
+				.profilePic(profile.getProfilePicUrl())
+				.build();
+	}
+
+	public ProfileResponse toProfileResponseByUsername(Profile profile) {
+
+		return ProfileResponse.builder()
+				.memberId(profile.getId())
+				.username(profile.getUsername())
+				.nickname(profile.getNickname())
+				.intro(profile.getBlogIntro())
+				.build();
+	}
 }

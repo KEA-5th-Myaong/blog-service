@@ -26,6 +26,25 @@ public class ProfileController {
 
 		return ApiResponse.onSuccess(null);
 	}
+
+	@Operation(summary = "서비스간 API v0.4 line 6", description = "회원의 프로필 정보 조회")
+	@GetMapping(headers = "memberId")
+	public ApiResponse<ProfileResponse> getProfile(@RequestHeader(name = "memberId") Long memberId) {
+
+		ProfileResponse res = profileQueryService.getProfileByMemberId(memberId);
+
+		return ApiResponse.onSuccess(res);
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 49", description = "타인 정보 조회")
+	@GetMapping(params = "username")
+	public ApiResponse<ProfileResponse> getProfile(@RequestParam(name = "username") String username) {
+
+		ProfileResponse res = profileQueryService.getProfileByUsername(username);
+
+		return ApiResponse.onSuccess(res);
+	}
+
 	@Operation(summary = "API 명세서 v0.3 line 23", description = "팔로우 토글(팔로우 시 알림 발송 기능은 아직 미구현)")
 	@PostMapping("/{memberId}/follow")
 	public ApiResponse<ProfileResponse.FollowDTO> followProfile(@PathVariable(required = false) Long memberId) {

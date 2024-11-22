@@ -41,6 +41,22 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 	}
 
 	@Override
+	public ProfileResponse getProfileByMemberId(Long memberId) {
+
+		Profile profile = findById(memberId);
+
+		return profileConverter.toProfileResponseByMemberId(profile);
+	}
+
+	@Override
+	public ProfileResponse getProfileByUsername(String username) {
+
+		Profile profile = findByUsername(username);
+
+		return profileConverter.toProfileResponseByUsername(profile);
+	}
+
+	@Override
 	public ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId) {
 		// 1부터 10까지의 ID 리스트 생성
 		List<Long> ids = LongStream.rangeClosed(1, 10)

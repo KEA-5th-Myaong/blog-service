@@ -13,6 +13,10 @@ public interface ProfileQueryService {
 
 	Profile findByUsername(String username);
 
+	ProfileResponse getProfileByMemberId(Long memberId);
+
+	ProfileResponse getProfileByUsername(String username);
+
 	ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId);
 
 	ProfileResponse.FollowedListDTO getProfileFollowedList(Long memberId, Long lastId);
