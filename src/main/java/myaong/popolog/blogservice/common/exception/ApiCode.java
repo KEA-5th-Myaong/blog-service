@@ -17,6 +17,7 @@ public enum ApiCode {
 
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "PROFILE_4040", "존재하지 않는 회원입니다."),
 	SELF_FOLLOW_CONFLICT(HttpStatus.CONFLICT, "PROFILE_4090", "Cannot follow oneself."),
+	MEMBER_CONFLICT(HttpStatus.CONFLICT, "PROFILE_4091", "이미 프로필이 존재하는 회원입니다."),
 	UNSUPPORTED_PROFILE_PIC(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "PROFILE_4150", "Unsupported media type"),
 
 	INVALID_PREJOBS(HttpStatus.BAD_REQUEST, "POST_4000", "회원의 관심 직군에 한해서만 요청할 수 있습니다."),
