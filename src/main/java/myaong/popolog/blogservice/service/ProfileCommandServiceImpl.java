@@ -1,6 +1,8 @@
 package myaong.popolog.blogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.common.exception.ApiCode;
+import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
@@ -16,6 +18,35 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 
 	private final ProfileQueryService profileQueryService;
 	private final FollowRepository followRepository;
+	private final ProfileConverter profileConverter;
+
+	@Override
+	public Boolean existsById(Long memberId) {
+		return profileRepository.existsById(memberId);
+	}
+
+	@Override
+	public Profile findById(Long memberId) {
+		return profileRepository.findById(memberId)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public Profile findByUsername(String username) {
+		return profileRepository.findByUsername(username)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public void createProfile(NewProfileRequest newProfileRequest) {
+
+		if (existsById(newProfileRequest.getMemberId())) {
+			throw new ApiException(ApiCode.MEMBER_CONFLICT);
+		}
+
+		Profile profile = profileConverter.fromNewProfileRequest(newProfileRequest);
+		profileRepository.save(profile);
+	}
 
 	@Override
 	public ProfileResponse.FollowDTO followProfile(Long memberId) {

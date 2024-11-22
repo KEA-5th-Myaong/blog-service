@@ -14,12 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Controller("/blog/profile")
+@RequestMapping("/blog/profiles")
 public class ProfileController {
 
 	private final ProfileQueryService profileQueryService;
 	private final ProfileCommandService profileCommandService;
 
+	@Operation(summary = "서비스간 API v0.4 line 5", description = "블로그 프로필 등록")
+	@PostMapping
+	public ApiResponse<Object> createProfile(@Valid @RequestBody NewProfileRequest newProfileRequest) {
+
+		profileCommandService.createProfile(newProfileRequest);
+
+		return ApiResponse.onSuccess(null);
+	}
 	@Operation(summary = "API 명세서 v0.3 line 23", description = "팔로우 토글(팔로우 시 알림 발송 기능은 아직 미구현)")
 	@PostMapping("/{memberId}/follow")
 	public ApiResponse<ProfileResponse.FollowDTO> followProfile(@PathVariable(required = false) Long memberId) {

@@ -35,7 +35,7 @@ public class Profile extends BaseEntity {
 	@Column(name = "profile_pic_url")
 	private String profilePicUrl;
 
-	@Column(name = "blog_intro")
+	@Column(name = "blog_intro", nullable = false)
 	private String blogIntro;
 
 	// 내가 팔로우하는 사람 목록

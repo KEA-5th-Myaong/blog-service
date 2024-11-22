@@ -72,4 +72,14 @@ public class ProfileConverter {
 				.isFollowed(false)
 				.build();
 	}
+
+	public Profile fromNewProfileRequest(NewProfileRequest request) {
+		return Profile.builder()
+				.id(request.getMemberId())
+				.username(request.getUsername())
+				.name(request.getName())
+				.nickname(request.getNickname())
+				.blogIntro(String.format("%s의 블로그입니다.", request.getNickname()))
+				.build();
+	}
 }
