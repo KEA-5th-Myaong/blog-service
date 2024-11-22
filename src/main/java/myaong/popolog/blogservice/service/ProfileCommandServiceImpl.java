@@ -9,6 +9,7 @@ import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.FollowRepository;
+import myaong.popolog.blogservice.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
