@@ -17,10 +17,28 @@ import java.util.stream.LongStream;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 	private final ProfileRepository profileRepository;
+	private final ProfileConverter profileConverter;
+
+	@Override
+	public Boolean existsById(Long memberId) {
+		return profileRepository.existsById(memberId);
+	}
+
+	@Override
+	public Profile findById(Long memberId) {
+		return profileRepository.findById(memberId)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public Profile findByUsername(String username) {
+		return profileRepository.findByUsername(username)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
 
 	@Override
 	public ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId) {

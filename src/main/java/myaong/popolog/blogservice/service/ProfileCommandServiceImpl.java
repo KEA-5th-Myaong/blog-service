@@ -24,26 +24,9 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	private final ProfileConverter profileConverter;
 
 	@Override
-	public Boolean existsById(Long memberId) {
-		return profileRepository.existsById(memberId);
-	}
-
-	@Override
-	public Profile findById(Long memberId) {
-		return profileRepository.findById(memberId)
-				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
-	}
-
-	@Override
-	public Profile findByUsername(String username) {
-		return profileRepository.findByUsername(username)
-				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
-	}
-
-	@Override
 	public void createProfile(NewProfileRequest newProfileRequest) {
 
-		if (existsById(newProfileRequest.getMemberId())) {
+		if (profileQueryService.existsById(newProfileRequest.getMemberId())) {
 			throw new ApiException(ApiCode.MEMBER_CONFLICT);
 		}
 

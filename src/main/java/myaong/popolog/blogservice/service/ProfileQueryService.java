@@ -7,6 +7,12 @@ import java.util.List;
 
 public interface ProfileQueryService {
 
+	Boolean existsById(Long memberId);
+
+	Profile findById(Long memberId);
+
+	Profile findByUsername(String username);
+
 	ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId);
 
 	ProfileResponse.FollowedListDTO getProfileFollowedList(Long memberId, Long lastId);
