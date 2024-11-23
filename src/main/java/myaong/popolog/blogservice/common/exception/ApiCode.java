@@ -14,6 +14,7 @@ public enum ApiCode {
 	METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON_4050", "Method not allowed"),
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_5000", "Internal Server Error"),
 	DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_5001", "DB Error"),
+	OBJECT_STORAGE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_5002", "Object Storage Error"),
 
 	MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "PROFILE_4040", "존재하지 않는 회원입니다."),
 	SELF_FOLLOW_CONFLICT(HttpStatus.CONFLICT, "PROFILE_4090", "Cannot follow oneself."),
