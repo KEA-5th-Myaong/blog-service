@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.service.ProfileCommandService;
 import myaong.popolog.blogservice.service.ProfileQueryService;
@@ -32,6 +33,16 @@ public class ProfileController {
 	public ApiResponse<ProfileResponse> getProfile(@RequestHeader(name = "memberId") Long memberId) {
 
 		ProfileResponse res = profileQueryService.getProfileByMemberId(memberId);
+
+		return ApiResponse.onSuccess(res);
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 31", description = "회원 정보 조회 (블로그 접속 시)")
+	@GetMapping("/{memberId}/info")
+	public ApiResponse<ProfileInfoResponse> getProfileInfo(@RequestHeader(name = "memberId", required = false) Long requesterId,
+														   @PathVariable("memberId") Long memberId) {
+
+		ProfileInfoResponse res = profileQueryService.getProfileInfo(requesterId, memberId);
 
 		return ApiResponse.onSuccess(res);
 	}

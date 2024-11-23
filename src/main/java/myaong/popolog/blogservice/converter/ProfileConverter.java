@@ -1,16 +1,23 @@
 package myaong.popolog.blogservice.converter;
 
+import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
+import myaong.popolog.blogservice.entity.Prejob;
 import myaong.popolog.blogservice.entity.Profile;
+import myaong.popolog.blogservice.repository.FollowRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ProfileConverter {
+
+	private final FollowRepository followRepository;
 
 	public static ProfileResponse.PartialInfoDTO toPartialInfoDTO(Profile profile) {
 		return ProfileResponse.PartialInfoDTO.builder()
@@ -90,6 +97,20 @@ public class ProfileConverter {
 				.name(profile.getName())
 				.nickname(profile.getNickname())
 				.profilePic(profile.getProfilePicUrl())
+				.build();
+	}
+
+	public ProfileInfoResponse toProfileInfoResponse(Profile requester, Profile profile) {
+
+		return ProfileInfoResponse.builder()
+				.memberId(profile.getId())
+				.nickname(profile.getNickname())
+				.username(profile.getUsername())
+				.isFollowing(followRepository.existsByFollowingAndFollowed(requester, profile))
+				.followingCount(profile.getFollowings().size())
+				.followerCount(profile.getFollowers().size())
+				.profilePicUrl(profile.getProfilePicUrl())
+				.prejob(profile.getPrejobs().stream().map(Prejob::getJobName).toList())
 				.build();
 	}
 

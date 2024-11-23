@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
+import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
@@ -49,12 +50,23 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 	}
 
 	@Override
+	public ProfileInfoResponse getProfileInfo(Long requesterId, Long memberId) {
+
+		Profile requester = findById(requesterId);
+		Profile profile = findById(memberId);
+
+		return profileConverter.toProfileInfoResponse(requester, profile);
+	}
+
+	@Override
 	public ProfileResponse getProfileByUsername(String username) {
 
 		Profile profile = findByUsername(username);
 
 		return profileConverter.toProfileResponseByUsername(profile);
 	}
+
+	/***** follow 관련 메소드 *****/
 
 	@Override
 	public ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId) {
@@ -78,12 +90,6 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
 
 		return ProfileConverter.toFollowedListDTO(findProfileList);
-	}
-
-	@Override
-	public Profile findProfileByMemberId(Long memberId) {
-		return profileRepository.findById(memberId)
-				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
 	}
 
 	@Override

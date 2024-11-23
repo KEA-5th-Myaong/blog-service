@@ -37,8 +37,8 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	@Override
 	public ProfileResponse.FollowDTO followProfile(Long memberId) {
 		// 일단 팔로우하는 사람은 id가 5인 member
-		Profile followingProfile = profileQueryService.findProfileByMemberId(5L);
-		Profile followedProfile = profileQueryService.findProfileByMemberId(memberId);
+		Profile followingProfile = profileQueryService.findById(5L);
+		Profile followedProfile = profileQueryService.findById(memberId);
 
 		boolean isExist = followRepository.existsByFollowingAndFollowed(followingProfile, followedProfile);
 
