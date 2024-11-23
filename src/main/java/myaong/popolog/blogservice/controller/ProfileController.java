@@ -21,20 +21,20 @@ public class ProfileController {
 
 	@Operation(summary = "서비스간 API v0.4 line 5", description = "블로그 프로필 등록")
 	@PostMapping
-	public ApiResponse<Object> createProfile(@Valid @RequestBody NewProfileRequest newProfileRequest) {
+	public Object createProfile(@Valid @RequestBody NewProfileRequest newProfileRequest) {
 
 		profileCommandService.createProfile(newProfileRequest);
 
-		return ApiResponse.onSuccess(null);
+		return null;
 	}
 
 	@Operation(summary = "서비스간 API v0.4 line 6", description = "회원의 프로필 정보 조회")
 	@GetMapping(headers = "memberId")
-	public ApiResponse<ProfileResponse> getProfile(@RequestHeader(name = "memberId") Long memberId) {
+	public ProfileResponse getProfile(@RequestHeader(name = "memberId") Long memberId) {
 
 		ProfileResponse res = profileQueryService.getProfileByMemberId(memberId);
 
-		return ApiResponse.onSuccess(res);
+		return res;
 	}
 
 	@Operation(summary = "API 명세서 v0.4 line 31", description = "회원 정보 조회 (블로그 접속 시)")

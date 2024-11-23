@@ -16,7 +16,7 @@ public class ProfileResponse {
 	private String username;	// nullable
 	private String name;
 	private String nickname;
-	private String profilePic;	// nullable
+	private String profilePicUrl;	// nullable
 	private String intro;	// nullable
 
 	@Builder
