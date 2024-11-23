@@ -96,7 +96,7 @@ public class ProfileConverter {
 		return ProfileResponse.builder()
 				.name(profile.getName())
 				.nickname(profile.getNickname())
-				.profilePic(profile.getProfilePicUrl())
+				.profilePicUrl(profile.getProfilePicUrl())
 				.build();
 	}
 
