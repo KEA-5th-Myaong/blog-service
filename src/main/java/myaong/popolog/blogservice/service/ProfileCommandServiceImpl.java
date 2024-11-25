@@ -1,10 +1,12 @@
 package myaong.popolog.blogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.common.Prefix;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
@@ -12,6 +14,7 @@ import myaong.popolog.blogservice.repository.FollowRepository;
 import myaong.popolog.blogservice.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	private final ProfileRepository profileRepository;
 	private final FollowRepository followRepository;
 	private final ProfileConverter profileConverter;
+	private final S3ApiService s3ApiService;
 
 	@Override
 	public void createProfile(NewProfileRequest newProfileRequest) {
@@ -32,6 +36,36 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 
 		Profile profile = profileConverter.fromNewProfileRequest(newProfileRequest);
 		profileRepository.save(profile);
+	}
+
+	private void deleteProfilePic(Profile profile) {
+
+		if (!profile.getProfilePicUrl().isEmpty()) {
+			s3ApiService.deleteFromPersistentStorage(profile.getProfilePicUrl());
+		}
+	}
+
+	@Override
+	public ProfilePicUrlResponse updateProfilePic(Long memberId) {
+
+		Profile profile = profileQueryService.findById(memberId);
+		deleteProfilePic(profile);
+
+		return null;
+	}
+
+	@Override
+	public ProfilePicUrlResponse updateProfilePic(Long memberId, MultipartFile pic) {
+
+		Profile profile = profileQueryService.findById(memberId);
+		// 기존 프로필 사진이 있다면 삭제
+		deleteProfilePic(profile);
+
+		String profilePicUrl = s3ApiService.uploadToPersistentStorage(Prefix.PROFILE, pic);
+
+		profile.updateProfilePicUrl(profilePicUrl);
+
+		return new ProfilePicUrlResponse(profilePicUrl);
 	}
 
 	@Override

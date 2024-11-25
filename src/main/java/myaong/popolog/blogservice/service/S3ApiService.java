@@ -22,6 +22,16 @@ public class S3ApiService {
 	private final S3Client s3Client;
 
 	/**
+	 * URL에서 Object Storage key를 추출합니다.
+	 *
+	 * @param url 파일 주소
+	 * @return key
+	 */
+	private String getKeyFrom(String url, String bucketName) {
+		return url.substring(url.lastIndexOf(bucketName) + bucketName.length() + 1);
+	}
+
+	/**
 	 * 콘텐츠가 DB에 저장되기 전이라면, 파일을 임시로 저장합니다.
 	 * 임시 저장소에 저장된 파일은 24시간 후 자동으로 삭제됩니다.
 	 * <br>
@@ -30,19 +40,27 @@ public class S3ApiService {
 	 * @return URL of uploaded file
 	 */
 	public String uploadToTempStorage(Prefix prefix, MultipartFile file) {
-		return uploadToTempStorage(prefix.toString(), file);
+		return uploadToStorage(TEMP_BUCKET_NAME, prefix.toString(), file);
+	}
+
+	/**
+	 * 파일을 즉시 영구 저장소에 저장합니다.
+	 * <br>
+	 * prefix의 일관성 유지를 위해 Enum 객체를 받습니다. 필요 시 Prefix에 값을 추가하여 사용할 수 있습니다.
+	 *
+	 * @return URL of uploaded file
+	 */
+	public String uploadToPersistentStorage(Prefix prefix, MultipartFile file) {
+		return uploadToStorage(PERSISTENT_BUCKET_NAME, prefix.toString(), file);
 	}
 
 	/**
 	 * <strong>prefix의 일관성 유지를 위해 uploadToTempStorage(Prefix storageName, MultipartFile file) 사용이 권장됩니다.</strong>
-	 * <br>
-	 * 콘텐츠가 DB에 저장되기 전이라면, 파일을 임시로 저장합니다.
-	 * 임시 저장소에 저장된 파일은 24시간 후 자동으로 삭제됩니다.
 	 *
 	 * @param keyPrefix e.g., "your/prefix"
 	 * @return URL of uploaded file
 	 */
-	public String uploadToTempStorage(String keyPrefix, MultipartFile file) {
+	public String uploadToStorage(String bucketName, String keyPrefix, MultipartFile file) {
 
 		// 확장자 추출
 		String originalFilename = file.getOriginalFilename();
@@ -55,14 +73,15 @@ public class S3ApiService {
 		String fileName = UUID.randomUUID() + extension;
 		String key = keyPrefix + "/" + fileName;
 
-		return uploadObject(TEMP_BUCKET_NAME, key, file);
+		return uploadObject(bucketName, key, file);
 	}
 
 	/**
 	 * 영구 저장소에서 파일을 삭제합니다.
-	 * @param key e.g., "prefix/filename.png"
+	 * @param url 파일 주소
 	 */
-	public void deleteFromPersistentStorage(String key) {
+	public void deleteFromPersistentStorage(String url) {
+		String key = getKeyFrom(url, PERSISTENT_BUCKET_NAME);
 		deleteObject(PERSISTENT_BUCKET_NAME, key);
 	}
 
@@ -70,20 +89,23 @@ public class S3ApiService {
 	 * 콘텐츠를 수정 시 기존 파일들을 임시 저장소로 옮겨,
 	 * 삭제된 파일들은 24시간 후 자동으로 삭제되도록 합니다.
 	 *
-	 * @param key e.g., "prefix/filename.png"
+	 * @param url 파일 주소
 	 * @return URL of copied file to target bucket
 	 */
-	public String moveToTempStorage(String key) {
+	public String moveToTempStorage(String url) {
+		String key = getKeyFrom(url, PERSISTENT_BUCKET_NAME);
 		return moveObject(PERSISTENT_BUCKET_NAME, key, TEMP_BUCKET_NAME, key);
 	}
 
 	/**
 	 * 콘텐츠가 DB에 저장될 것이 확정되면, 파일을 영구 저장소로 복제합니다.
 	 *
-	 * @param key e.g., "prefix/filename.png"
+	 * @param url 파일 주소
 	 * @return URL of copied file to target bucket
 	 */
-	public String moveToPersistentStorage(String key) {
+	public String moveToPersistentStorage(String url) {
+
+		String key = getKeyFrom(url, TEMP_BUCKET_NAME);
 
 		// prefix 및 확장자 추출
 		String prefix = key.substring(0, key.lastIndexOf("/"));

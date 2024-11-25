@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
 import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
+import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.service.ProfileCommandService;
 import myaong.popolog.blogservice.service.ProfileQueryService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,9 +44,7 @@ public class ProfileController {
 	public ApiResponse<ProfileInfoResponse> getProfileInfo(@RequestHeader(name = "memberId", required = false) Long requesterId,
 														   @PathVariable("memberId") Long memberId) {
 
-		ProfileInfoResponse res = profileQueryService.getProfileInfo(requesterId, memberId);
-
-		return ApiResponse.onSuccess(res);
+		return ApiResponse.onSuccess(profileQueryService.getProfileInfo(requesterId, memberId));
 	}
 
 	@Operation(summary = "API 명세서 v0.4 line 49", description = "타인 정보 조회")
@@ -54,6 +54,18 @@ public class ProfileController {
 		ProfileResponse res = profileQueryService.getProfileByUsername(username);
 
 		return ApiResponse.onSuccess(res);
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 53", description = "프로필 사진 수정")
+	@PostMapping("/pic")
+	public ApiResponse<ProfilePicUrlResponse> updateProfilePic(@RequestHeader("memberId") Long memberId,
+															   @RequestParam(value = "pic", required = false) MultipartFile pic) {
+
+		if (pic == null || pic.isEmpty()) {
+			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId));
+		} else {
+			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId, pic));
+		}
 	}
 
 	@Operation(summary = "API 명세서 v0.3 line 23", description = "팔로우 토글(팔로우 시 알림 발송 기능은 아직 미구현)")
