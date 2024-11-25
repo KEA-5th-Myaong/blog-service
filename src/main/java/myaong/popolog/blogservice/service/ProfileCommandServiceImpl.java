@@ -6,6 +6,7 @@ import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.request.UpdateProfileRequest;
 import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
@@ -66,6 +67,13 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 		profile.updateProfilePicUrl(profilePicUrl);
 
 		return new ProfilePicUrlResponse(profilePicUrl);
+	}
+
+	@Override
+	public void updateProfile(Long memberId, UpdateProfileRequest req) {
+
+		Profile profile = profileQueryService.findById(memberId);
+		profile.updateNameAndBlogIntro(req.getName(), req.getBlogIntro());
 	}
 
 	@Override

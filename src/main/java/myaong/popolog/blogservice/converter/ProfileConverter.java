@@ -106,6 +106,7 @@ public class ProfileConverter {
 				.memberId(profile.getId())
 				.nickname(profile.getNickname())
 				.username(profile.getUsername())
+				.blogIntro(profile.getBlogIntro())
 				.isFollowing(followRepository.existsByFollowingAndFollowed(requester, profile))
 				.followingCount(profile.getFollowings().size())
 				.followerCount(profile.getFollowers().size())
@@ -120,7 +121,7 @@ public class ProfileConverter {
 				.memberId(profile.getId())
 				.username(profile.getUsername())
 				.nickname(profile.getNickname())
-				.intro(profile.getBlogIntro())
+				.blogIntro(profile.getBlogIntro())
 				.build();
 	}
 }

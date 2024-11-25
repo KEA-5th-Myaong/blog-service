@@ -17,7 +17,7 @@ public class ProfileResponse {
 	private String name;
 	private String nickname;
 	private String profilePicUrl;	// nullable
-	private String intro;	// nullable
+	private String blogIntro;	// nullable
 
 	@Builder
 	@Getter

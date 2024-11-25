@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.request.UpdateProfileRequest;
 import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
@@ -66,6 +67,16 @@ public class ProfileController {
 		} else {
 			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId, pic));
 		}
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 54", description = "프로필 정보 수정")
+	@PutMapping
+	public ApiResponse<Object> updateProfile(@RequestHeader("memberId") Long memberId,
+														   @Valid @RequestBody UpdateProfileRequest req) {
+
+		profileCommandService.updateProfile(memberId, req);
+
+		return ApiResponse.onSuccess(null);
 	}
 
 	@Operation(summary = "API 명세서 v0.3 line 23", description = "팔로우 토글(팔로우 시 알림 발송 기능은 아직 미구현)")
