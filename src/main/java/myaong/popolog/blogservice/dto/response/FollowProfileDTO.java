@@ -10,5 +10,5 @@ public class FollowProfileDTO {
 	private Long memberId;
 	private String nickname;
 	private String profilePicUrl;
-	private boolean isFollowed;
+	private boolean isFollowing;
 }

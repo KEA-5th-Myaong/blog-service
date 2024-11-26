@@ -94,7 +94,7 @@ public class ProfileController {
 	}
 
 	@Operation(summary = "API 명세서 v0.4 line 52", description = "팔로워 조회")
-	@GetMapping("/{memberId}/followed/{lastId}")
+	@GetMapping("/{memberId}/follower/{lastId}")
 	public ApiResponse<FollowersResponse> getProfileFollowedList(@RequestHeader(name = "memberId", required = false) Long requesterId,
 																 @PathVariable @Positive(message = "잘못된 회원 아이디입니다.") Long memberId,
 																 @PathVariable @PositiveOrZero(message = "lastId는 0 이상이어야 합니다.") Long lastId) {
