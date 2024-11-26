@@ -35,7 +35,7 @@ public class Profile extends BaseEntity {
 	@Column(name = "profile_pic_url")
 	private String profilePicUrl;
 
-	@Column(name = "blog_intro")
+	@Column(name = "blog_intro", nullable = false)
 	private String blogIntro;
 
 	// 내가 팔로우하는 사람 목록
@@ -65,6 +65,15 @@ public class Profile extends BaseEntity {
 		this.name = name;
 		this.nickname = nickname;
 		this.profilePicUrl = profilePicUrl;
+		this.blogIntro = blogIntro;
+	}
+
+	public void updateProfilePicUrl(String profilePicUrl) {
+		this.profilePicUrl = profilePicUrl;
+	}
+
+	public void updateNameAndBlogIntro(String name, String blogIntro) {
+		this.name = name;
 		this.blogIntro = blogIntro;
 	}
 }

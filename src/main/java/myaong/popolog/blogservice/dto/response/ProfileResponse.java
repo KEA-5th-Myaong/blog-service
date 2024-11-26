@@ -8,7 +8,16 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
+@Getter
 public class ProfileResponse {
+
+	private Long memberId;	// nullable
+	private String username;	// nullable
+	private String name;
+	private String nickname;
+	private String profilePicUrl;	// nullable
+	private String blogIntro;	// nullable
 
 	@Builder
 	@Getter

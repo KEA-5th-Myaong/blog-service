@@ -40,7 +40,7 @@ public class MainPageServiceImpl implements MainPageService {
 	@Override
 	public MainPageResponse getRecommendPosts(Long memberId, List<Long> preJobs, Long lastId) {
 
-		Profile member = profileQueryService.findProfileByMemberId(memberId);
+		Profile member = profileQueryService.findById(memberId);
 
 		// 요청된 관심직군 중 사용자의 관심 직군이 아닌 것이 있는지 검증
 		List<Long> prejobsOfMember = member.getPrejobs().stream().map(Prejob::getJobId).toList();
@@ -61,7 +61,7 @@ public class MainPageServiceImpl implements MainPageService {
 	@Override
 	public MainPageResponse getFollowingPosts(Long memberId, Long lastId) {
 
-		Profile member = profileQueryService.findProfileByMemberId(memberId);
+		Profile member = profileQueryService.findById(memberId);
 
 		List<Post> postList;
 		if (lastId.equals(0L)) {
@@ -76,7 +76,7 @@ public class MainPageServiceImpl implements MainPageService {
 	@Override
 	public MainPageResponse getBookmarkedPosts(Long memberId, Long lastId) {
 
-		Profile member = profileQueryService.findProfileByMemberId(memberId);
+		Profile member = profileQueryService.findById(memberId);
 
 		List<Tuple> tupleList;
 		if (lastId.equals(0L)) {

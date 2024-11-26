@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
+import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
@@ -17,10 +18,55 @@ import java.util.stream.LongStream;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 	private final ProfileRepository profileRepository;
+	private final ProfileConverter profileConverter;
+
+	@Override
+	public Boolean existsById(Long memberId) {
+		return profileRepository.existsById(memberId);
+	}
+
+	@Override
+	public Profile findById(Long memberId) {
+		return profileRepository.findById(memberId)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public Profile findByUsername(String username) {
+		return profileRepository.findByUsername(username)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public ProfileResponse getProfileByMemberId(Long memberId) {
+
+		Profile profile = findById(memberId);
+
+		return profileConverter.toProfileResponseByMemberId(profile);
+	}
+
+	@Override
+	public ProfileInfoResponse getProfileInfo(Long requesterId, Long memberId) {
+
+		Profile requester = findById(requesterId);
+		Profile profile = findById(memberId);
+
+		return profileConverter.toProfileInfoResponse(requester, profile);
+	}
+
+	@Override
+	public ProfileResponse getProfileByUsername(String username) {
+
+		Profile profile = findByUsername(username);
+
+		return profileConverter.toProfileResponseByUsername(profile);
+	}
+
+	/***** follow 관련 메소드 *****/
 
 	@Override
 	public ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId) {
@@ -44,12 +90,6 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
 
 		return ProfileConverter.toFollowedListDTO(findProfileList);
-	}
-
-	@Override
-	public Profile findProfileByMemberId(Long memberId) {
-		return profileRepository.findById(memberId)
-				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
 	}
 
 	@Override
