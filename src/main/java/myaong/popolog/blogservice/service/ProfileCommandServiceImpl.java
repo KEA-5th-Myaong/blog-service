@@ -7,8 +7,8 @@ import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
 import myaong.popolog.blogservice.dto.request.UpdateProfileRequest;
+import myaong.popolog.blogservice.dto.response.FollowResponse;
 import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
-import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.FollowRepository;
@@ -77,26 +77,26 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	}
 
 	@Override
-	public ProfileResponse.FollowDTO followProfile(Long memberId) {
+	public FollowResponse followProfile(Long requesterId, Long memberId) {
 		// 일단 팔로우하는 사람은 id가 5인 member
 		Profile followingProfile = profileQueryService.findById(5L);
 		Profile followedProfile = profileQueryService.findById(memberId);
 
 		boolean isExist = followRepository.existsByFollowingAndFollowed(followingProfile, followedProfile);
 
-		ProfileResponse.FollowDTO followDTO;
+		FollowResponse followResponse;
 
 		// 팔로우 내역이 이미 존재하면 팔로우 취소
 		if (isExist) {
 			followRepository.deleteByFollowingAndFollowed(followingProfile, followedProfile);
-			followDTO = ProfileConverter.toFollowDTO(false);
+			followResponse = ProfileConverter.toFollowResponse(false);
 
 		} else { // 새로 팔로우 정보 등록
 			Follow follow = ProfileConverter.toFollow(followingProfile, followedProfile);
 			followRepository.save(follow);
-			followDTO = ProfileConverter.toFollowDTO(true);
+			followResponse = ProfileConverter.toFollowResponse(true);
 		}
 
-		return followDTO;
+		return followResponse;
 	}
 }

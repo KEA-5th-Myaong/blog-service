@@ -1,5 +1,7 @@
 package myaong.popolog.blogservice.service;
 
+import myaong.popolog.blogservice.dto.response.FollowersResponse;
+import myaong.popolog.blogservice.dto.response.FollowingsResponse;
 import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Profile;
@@ -22,9 +24,9 @@ public interface ProfileQueryService {
 
 	/***** follow 관련 메소드 *****/
 
-	ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId);
+	FollowingsResponse getProfileFollowingList(Long requesterId, Long memberId, Long lastId);
 
-	ProfileResponse.FollowedListDTO getProfileFollowedList(Long memberId, Long lastId);
+	FollowersResponse getProfileFollowedList(Long requesterId, Long memberId, Long lastId);
 
 	/**
 	 * 해당 회원을 팔로우하는 회원 목록

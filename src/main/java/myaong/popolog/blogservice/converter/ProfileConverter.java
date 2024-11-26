@@ -2,8 +2,7 @@ package myaong.popolog.blogservice.converter;
 
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
-import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
-import myaong.popolog.blogservice.dto.response.ProfileResponse;
+import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Prejob;
 import myaong.popolog.blogservice.entity.Profile;
@@ -11,7 +10,6 @@ import myaong.popolog.blogservice.repository.FollowRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -19,61 +17,50 @@ public class ProfileConverter {
 
 	private final FollowRepository followRepository;
 
-	public static ProfileResponse.PartialInfoDTO toPartialInfoDTO(Profile profile) {
-		return ProfileResponse.PartialInfoDTO.builder()
-				.memberId(profile.getId())
-				.username(profile.getUsername())
-				.nickname(profile.getNickname())
-				.build();
+	/**** 수정 필요 시작 ****/
 
-	}
+	public static FollowResponse toFollowResponse(boolean following) {
 
-	public static ProfileResponse.FollowDTO toFollowDTO(boolean following) {
-		return ProfileResponse.FollowDTO.builder()
+		return FollowResponse.builder()
 				.following(following)
 				.build();
 	}
 
 	public static Follow toFollow(Profile followingProfile, Profile followedProfile) {
+
 		return Follow.builder()
 				.following(followingProfile)
 				.followed(followedProfile)
 				.build();
 	}
 
-	public static ProfileResponse.FollowingListDTO toFollowingListDTO(List<Profile> profileList) {
-		List<ProfileResponse.FollowingDTO> followingDTOList = profileList.stream()
-				.map(member -> ProfileConverter.toFollowingDTO(member))
-				.collect(Collectors.toList());
+	public static FollowingsResponse toFollowingsResponse(List<Profile> profileList) {
 
-		return ProfileResponse.FollowingListDTO.builder()
+		List<FollowProfileDTO> followProfileDTOList = profileList.stream()
+				.map(ProfileConverter::toFollowProfileDTO)
+				.toList();
+
+		return FollowingsResponse.builder()
 				.lastId(0L)
-				.followingDTOList(followingDTOList)
+				.followingDTOList(followProfileDTOList)
 				.build();
 	}
 
-	public static ProfileResponse.FollowingDTO toFollowingDTO(Profile profile) {
-		return ProfileResponse.FollowingDTO.builder()
-				.memberId(profile.getId())
-				.nickname(profile.getNickname())
-				.profilePicUrl(profile.getProfilePicUrl())
-				.isFollowed(true)
-				.build();
-	}
+	public static FollowersResponse toFollowersResponse(List<Profile> profileList) {
 
-	public static ProfileResponse.FollowedListDTO toFollowedListDTO(List<Profile> profileList) {
-		List<ProfileResponse.FollowedDTO> followedDTOList = profileList.stream()
-				.map(member -> ProfileConverter.toFollowedDTO(member))
-				.collect(Collectors.toList());
+		List<FollowProfileDTO> followProfileDTOList = profileList.stream()
+				.map(ProfileConverter::toFollowProfileDTO)
+				.toList();
 
-		return ProfileResponse.FollowedListDTO.builder()
+		return FollowersResponse.builder()
 				.lastId(0L)
-				.followedDTOList(followedDTOList)
+				.followedDTOList(followProfileDTOList)
 				.build();
 	}
 
-	public static ProfileResponse.FollowedDTO toFollowedDTO(Profile profile) {
-		return ProfileResponse.FollowedDTO.builder()
+	private static FollowProfileDTO toFollowProfileDTO(Profile profile) {
+
+		return FollowProfileDTO.builder()
 				.memberId(profile.getId())
 				.nickname(profile.getNickname())
 				.profilePicUrl(profile.getProfilePicUrl())
@@ -82,6 +69,7 @@ public class ProfileConverter {
 	}
 
 	public Profile fromNewProfileRequest(NewProfileRequest request) {
+
 		return Profile.builder()
 				.id(request.getMemberId())
 				.username(request.getUsername())

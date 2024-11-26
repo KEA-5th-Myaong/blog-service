@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
+import myaong.popolog.blogservice.dto.response.FollowersResponse;
+import myaong.popolog.blogservice.dto.response.FollowingsResponse;
 import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
@@ -69,7 +71,7 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 	/***** follow 관련 메소드 *****/
 
 	@Override
-	public ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId) {
+	public FollowingsResponse getProfileFollowingList(Long requesterId, Long memberId, Long lastId) {
 		// 1부터 10까지의 ID 리스트 생성
 		List<Long> ids = LongStream.rangeClosed(1, 10)
 				.boxed()
@@ -77,11 +79,11 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
 
-		return ProfileConverter.toFollowingListDTO(findProfileList);
+		return ProfileConverter.toFollowingsResponse(findProfileList);
 	}
 
 	@Override
-	public ProfileResponse.FollowedListDTO getProfileFollowedList(Long memberId, Long lastId) {
+	public FollowersResponse getProfileFollowedList(Long requesterId, Long memberId, Long lastId) {
 		// 1부터 10까지의 ID 리스트 생성
 		List<Long> ids = LongStream.rangeClosed(1, 10)
 				.boxed()
@@ -89,7 +91,7 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
 
-		return ProfileConverter.toFollowedListDTO(findProfileList);
+		return ProfileConverter.toFollowersResponse(findProfileList);
 	}
 
 	@Override
