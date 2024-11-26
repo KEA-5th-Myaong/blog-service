@@ -1,9 +1,9 @@
 package myaong.popolog.blogservice.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.entity.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +19,7 @@ public class QProfileRepositoryImpl implements QProfileRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<Tuple> findProfilesFollowedBy(Profile member, Long lastId) {
+	public List<SortedEntity<Profile>> findProfilesFollowedBy(Profile member, Long lastId) {
 
 		// member = following, result = followed
 		BooleanBuilder condition = new BooleanBuilder().and(follow.following.eq(member));
@@ -35,11 +35,14 @@ public class QProfileRepositoryImpl implements QProfileRepository {
 				.where(condition)
 				.orderBy(follow.id.desc())
 				.limit(10)
-				.fetch();
+				.fetch()
+				.stream()
+				.map(tuple -> new SortedEntity<>(tuple.get(profile), tuple.get(follow.id)))
+				.toList();
 	}
 
 	@Override
-	public List<Tuple> findProfilesFollowing(Profile member, Long lastId) {
+	public List<SortedEntity<Profile>> findProfilesFollowing(Profile member, Long lastId) {
 
 		// member = followed, result = following
 		BooleanBuilder condition = new BooleanBuilder().and(follow.followed.eq(member));
@@ -55,6 +58,9 @@ public class QProfileRepositoryImpl implements QProfileRepository {
 				.where(condition)
 				.orderBy(follow.id.desc())
 				.limit(10)
-				.fetch();
+				.fetch()
+				.stream()
+				.map(tuple -> new SortedEntity<>(tuple.get(profile), tuple.get(follow.id)))
+				.toList();
 	}
 }

@@ -1,7 +1,7 @@
 package myaong.popolog.blogservice.converter;
 
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
 import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.entity.Follow;
@@ -12,18 +12,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static myaong.popolog.blogservice.entity.QFollow.follow;
-import static myaong.popolog.blogservice.entity.QProfile.profile;
 
 @Component
 @RequiredArgsConstructor
 public class ProfileConverter {
 
 	private final FollowRepository followRepository;
-
-	/**** 수정 필요 시작 ****/
 
 	public FollowResponse toFollowResponse(boolean following) {
 
@@ -40,39 +34,39 @@ public class ProfileConverter {
 				.build();
 	}
 
-	public FollowingsResponse toFollowingsResponse(List<Tuple> tupleList, Profile requester) {
+	public FollowingsResponse toFollowingsResponse(List<SortedEntity<Profile>> tupleList, Profile requester) {
 
-		Map<String, Object> map = toFollowProfileDTOList(tupleList, requester);
+		SortedEntity<List<FollowProfileDTO>> sortedEntity = toFollowProfileDTOList(tupleList, requester);
 
 		return FollowingsResponse.builder()
-				.lastId((long) map.get("minId"))
-				.followingDTOList((List<FollowProfileDTO>) map.get("profiles"))
+				.lastId(sortedEntity.getKey())
+				.followingDTOList(sortedEntity.getEntity())
 				.build();
 	}
 
-	public FollowersResponse toFollowersResponse(List<Tuple> tupleList, Profile requester) {
+	public FollowersResponse toFollowersResponse(List<SortedEntity<Profile>> tupleList, Profile requester) {
 
-		Map<String, Object> map = toFollowProfileDTOList(tupleList, requester);
+		SortedEntity<List<FollowProfileDTO>> sortedEntity = toFollowProfileDTOList(tupleList, requester);
 
 		return FollowersResponse.builder()
-				.lastId((long) map.get("minId"))
-				.followedDTOList((List<FollowProfileDTO>) map.get("profiles"))
+				.lastId(sortedEntity.getKey())
+				.followedDTOList(sortedEntity.getEntity())
 				.build();
 	}
 
-	private Map<String, Object> toFollowProfileDTOList(List<Tuple> tupleList, Profile requester) {
+	private SortedEntity<List<FollowProfileDTO>> toFollowProfileDTOList(List<SortedEntity<Profile>> tupleList, Profile requester) {
 
 		List<FollowProfileDTO> profiles = new ArrayList<>();
 		long minId = Long.MAX_VALUE;
 
-		for (Tuple tuple : tupleList) {
+		for (SortedEntity<Profile> tuple : tupleList) {
 
-			Long followId = tuple.get(follow.id);
+			Long followId = tuple.getKey();
 			if (followId.compareTo(minId) < 0) {
 				minId = followId;
 			}
 
-			Profile following = tuple.get(profile);
+			Profile following = tuple.getEntity();
 			FollowProfileDTO profileDTO = toFollowProfileDTO(following, requester);
 			profiles.add(profileDTO);
 		}
@@ -80,10 +74,7 @@ public class ProfileConverter {
 		if (tupleList.size() < 10)
 			minId = -1L;
 
-		return Map.of(
-				"profiles", profiles,
-				"minId", minId
-		);
+		return new SortedEntity<>(profiles, minId);
 	}
 
 	private FollowProfileDTO toFollowProfileDTO(Profile profile, Profile requester) {
@@ -99,6 +90,8 @@ public class ProfileConverter {
 				.isFollowing(isFollowing)
 				.build();
 	}
+
+	/***** follow 관련 메소드 (위) *****/
 
 	public Profile fromNewProfileRequest(NewProfileRequest request) {
 

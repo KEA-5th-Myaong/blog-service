@@ -1,10 +1,10 @@
 package myaong.popolog.blogservice.service;
 
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
+import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.dto.response.FollowersResponse;
 import myaong.popolog.blogservice.dto.response.FollowingsResponse;
 import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
@@ -78,9 +78,9 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 		Profile member = findById(memberId);
 
-		List<Tuple> tupleList = profileRepository.findProfilesFollowedBy(member, lastId.equals(0L) ? null : lastId);
+		List<SortedEntity<Profile>> sortedProfileList = profileRepository.findProfilesFollowedBy(member, lastId.equals(0L) ? null : lastId);
 
-		return profileConverter.toFollowingsResponse(tupleList, requester);
+		return profileConverter.toFollowingsResponse(sortedProfileList, requester);
 	}
 
 	@Override
@@ -92,9 +92,9 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 		Profile member = findById(memberId);
 
-		List<Tuple> tupleList = profileRepository.findProfilesFollowing(member, lastId.equals(0L) ? null : lastId);
+		List<SortedEntity<Profile>> sortedProfileList = profileRepository.findProfilesFollowing(member, lastId.equals(0L) ? null : lastId);
 
-		return profileConverter.toFollowersResponse(tupleList, requester);
+		return profileConverter.toFollowersResponse(sortedProfileList, requester);
 	}
 
 	@Override
