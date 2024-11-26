@@ -78,8 +78,13 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 
 	@Override
 	public FollowResponse followProfile(Long requesterId, Long memberId) {
-		// 일단 팔로우하는 사람은 id가 5인 member
-		Profile followingProfile = profileQueryService.findById(5L);
+
+		// 자기 자신에 대해 요청할 수 없음
+		if (requesterId.equals(memberId)) {
+			throw new ApiException(ApiCode.SELF_FOLLOW_CONFLICT);
+		}
+
+		Profile followingProfile = profileQueryService.findById(requesterId);
 		Profile followedProfile = profileQueryService.findById(memberId);
 
 		boolean isExist = followRepository.existsByFollowingAndFollowed(followingProfile, followedProfile);
