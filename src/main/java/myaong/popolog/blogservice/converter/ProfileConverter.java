@@ -1,5 +1,6 @@
 package myaong.popolog.blogservice.converter;
 
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
 import myaong.popolog.blogservice.dto.response.*;
@@ -9,7 +10,12 @@ import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.FollowRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static myaong.popolog.blogservice.entity.QFollow.follow;
+import static myaong.popolog.blogservice.entity.QProfile.profile;
 
 @Component
 @RequiredArgsConstructor
@@ -19,14 +25,14 @@ public class ProfileConverter {
 
 	/**** 수정 필요 시작 ****/
 
-	public static FollowResponse toFollowResponse(boolean following) {
+	public FollowResponse toFollowResponse(boolean following) {
 
 		return FollowResponse.builder()
 				.following(following)
 				.build();
 	}
 
-	public static Follow toFollow(Profile followingProfile, Profile followedProfile) {
+	public Follow toFollow(Profile followingProfile, Profile followedProfile) {
 
 		return Follow.builder()
 				.following(followingProfile)
@@ -34,37 +40,63 @@ public class ProfileConverter {
 				.build();
 	}
 
-	public static FollowingsResponse toFollowingsResponse(List<Profile> profileList) {
+	public FollowingsResponse toFollowingsResponse(List<Tuple> tupleList, Profile requester) {
 
-		List<FollowProfileDTO> followProfileDTOList = profileList.stream()
-				.map(ProfileConverter::toFollowProfileDTO)
-				.toList();
+		Map<String, Object> map = toFollowProfileDTOList(tupleList, requester);
 
 		return FollowingsResponse.builder()
-				.lastId(0L)
-				.followingDTOList(followProfileDTOList)
+				.lastId((long) map.get("minId"))
+				.followingDTOList((List<FollowProfileDTO>) map.get("profiles"))
 				.build();
 	}
 
-	public static FollowersResponse toFollowersResponse(List<Profile> profileList) {
+	public FollowersResponse toFollowersResponse(List<Tuple> tupleList, Profile requester) {
 
-		List<FollowProfileDTO> followProfileDTOList = profileList.stream()
-				.map(ProfileConverter::toFollowProfileDTO)
-				.toList();
+		Map<String, Object> map = toFollowProfileDTOList(tupleList, requester);
 
 		return FollowersResponse.builder()
-				.lastId(0L)
-				.followedDTOList(followProfileDTOList)
+				.lastId((long) map.get("minId"))
+				.followedDTOList((List<FollowProfileDTO>) map.get("profiles"))
 				.build();
 	}
 
-	private static FollowProfileDTO toFollowProfileDTO(Profile profile) {
+	private Map<String, Object> toFollowProfileDTOList(List<Tuple> tupleList, Profile requester) {
+
+		List<FollowProfileDTO> profiles = new ArrayList<>();
+		long minId = Long.MAX_VALUE;
+
+		for (Tuple tuple : tupleList) {
+
+			Long followId = tuple.get(follow.id);
+			if (followId.compareTo(minId) < 0) {
+				minId = followId;
+			}
+
+			Profile following = tuple.get(profile);
+			FollowProfileDTO profileDTO = toFollowProfileDTO(following, requester);
+			profiles.add(profileDTO);
+		}
+
+		if (tupleList.size() < 10)
+			minId = -1L;
+
+		return Map.of(
+				"profiles", profiles,
+				"minId", minId
+		);
+	}
+
+	private FollowProfileDTO toFollowProfileDTO(Profile profile, Profile requester) {
+
+		// 로그인한 경우, 해당 회원이 대상 회원을 팔로우하고 있는지의 여부를 표시
+		// 로그인하지 않은 경우 팔로우 여부를 항상 false로 표시
+		boolean isFollowing = requester != null && followRepository.existsByFollowingAndFollowed(requester, profile);
 
 		return FollowProfileDTO.builder()
 				.memberId(profile.getId())
 				.nickname(profile.getNickname())
 				.profilePicUrl(profile.getProfilePicUrl())
-				.isFollowed(false)
+				.isFollowing(isFollowing)
 				.build();
 	}
 

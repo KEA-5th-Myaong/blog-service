@@ -1,5 +1,6 @@
 package myaong.popolog.blogservice.service;
 
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Service
 @RequiredArgsConstructor
@@ -72,26 +71,30 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 	@Override
 	public FollowingsResponse getProfileFollowingList(Long requesterId, Long memberId, Long lastId) {
-		// 1부터 10까지의 ID 리스트 생성
-		List<Long> ids = LongStream.rangeClosed(1, 10)
-				.boxed()
-				.collect(Collectors.toList());
 
-		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
+		Profile requester = requesterId != null
+				? findById(requesterId)
+				: null;
 
-		return ProfileConverter.toFollowingsResponse(findProfileList);
+		Profile member = findById(memberId);
+
+		List<Tuple> tupleList = profileRepository.findProfilesFollowedBy(member, lastId.equals(0L) ? null : lastId);
+
+		return profileConverter.toFollowingsResponse(tupleList, requester);
 	}
 
 	@Override
 	public FollowersResponse getProfileFollowedList(Long requesterId, Long memberId, Long lastId) {
-		// 1부터 10까지의 ID 리스트 생성
-		List<Long> ids = LongStream.rangeClosed(1, 10)
-				.boxed()
-				.collect(Collectors.toList());
 
-		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
+		Profile requester = requesterId != null
+				? findById(requesterId)
+				: null;
 
-		return ProfileConverter.toFollowersResponse(findProfileList);
+		Profile member = findById(memberId);
+
+		List<Tuple> tupleList = profileRepository.findProfilesFollowing(member, lastId.equals(0L) ? null : lastId);
+
+		return profileConverter.toFollowersResponse(tupleList, requester);
 	}
 
 	@Override

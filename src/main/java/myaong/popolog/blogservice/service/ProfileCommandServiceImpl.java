@@ -94,12 +94,12 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 		// 팔로우 내역이 이미 존재하면 팔로우 취소
 		if (isExist) {
 			followRepository.deleteByFollowingAndFollowed(followingProfile, followedProfile);
-			followResponse = ProfileConverter.toFollowResponse(false);
+			followResponse = profileConverter.toFollowResponse(false);
 
 		} else { // 새로 팔로우 정보 등록
-			Follow follow = ProfileConverter.toFollow(followingProfile, followedProfile);
+			Follow follow = profileConverter.toFollow(followingProfile, followedProfile);
 			followRepository.save(follow);
-			followResponse = ProfileConverter.toFollowResponse(true);
+			followResponse = profileConverter.toFollowResponse(true);
 		}
 
 		return followResponse;
