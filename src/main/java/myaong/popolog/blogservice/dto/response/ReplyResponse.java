@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CommentPostResponse {
+public class ReplyResponse {
     private Long commentId;
 }

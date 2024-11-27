@@ -6,8 +6,10 @@ import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.dto.request.CommentPostRequest;
 import myaong.popolog.blogservice.dto.request.CommentUpdateRequest;
+import myaong.popolog.blogservice.dto.request.ReplyRequest;
 import myaong.popolog.blogservice.dto.response.CommentPostResponse;
 import myaong.popolog.blogservice.dto.response.CommentUpdateResponse;
+import myaong.popolog.blogservice.dto.response.ReplyResponse;
 import myaong.popolog.blogservice.entity.Comment;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
@@ -28,6 +30,7 @@ public class CommentService {
     private final ProfileRepository profileRepository;
     private final NotificationServiceFeignClient notificationServiceFeignClient;
 
+    // 댓글 작성
     @Transactional
     public CommentPostResponse postComment(Long memberId, CommentPostRequest request) {
 
@@ -61,10 +64,11 @@ public class CommentService {
 
         // 댓글 작성 결과 반환
         return CommentPostResponse.builder()
-                .commentId(comment.getId().intValue())
+                .commentId(comment.getId())
                 .build();
     }
 
+    // 댓글 수정
     @Transactional
     public CommentUpdateResponse updateComment(Long memberId, Long commentId, CommentUpdateRequest request) {
 
@@ -108,7 +112,7 @@ public class CommentService {
         notificationServiceFeignClient.sendNotification(notificationRequest, NotificationType.COMMENT.name(), memberId);
     }
 
-
+    // 댓글 삭제
     @Transactional
     public void deleteComment(Long memberId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
@@ -117,6 +121,64 @@ public class CommentService {
             throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
         }
         commentRepository.delete(comment);
+    }
+
+    @Transactional
+    public ReplyResponse postReply(Long memberId, ReplyRequest request) {
+        // 부모 댓글 조회
+        Comment parentComment = commentRepository.findById(request.getCommentId())
+                .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
+
+        // 답글 작성자 프로필 조회
+        Profile commenterProfile = profileRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+
+        // 답글 내용 검증
+        if (request.getContent().trim().isEmpty()) {
+            throw new ApiException(ApiCode.INVALID_DATA);
+        }
+
+        // 답글 엔티티 생성
+        Comment reply = Comment.builder()
+                .post(parentComment.getPost())
+                .profile(commenterProfile)
+                .parentComment(parentComment) // 부모 댓글 설정
+                .content(request.getContent())
+                .isBlinded(false)
+                .build();
+
+        commentRepository.save(reply);
+
+        // 부모 댓글 작성자와 답글 작성자가 다를 경우 알림 전송
+        if (!parentComment.getProfile().getId().equals(memberId)) {
+            sendNotificationToCommentOwner(
+                    parentComment.getPost(),
+                    parentComment,
+                    commenterProfile.getNickname(),
+                    request.getContent(),
+                    memberId
+            );
+        }
+
+        // 답글 작성 결과 반환
+        return ReplyResponse.builder()
+                .commentId(reply.getId())
+                .build();
+    }
+
+
+    // 알림 전송 메서드
+    private void sendNotificationToCommentOwner(Post post, Comment parentComment, String commenterNickname, String replyContent, Long memberId) {
+        NotificationRequest notificationRequest = NotificationRequest.builder()
+                .memberId(parentComment.getProfile().getId()) // 부모 댓글 작성자 ID
+                .title(String.format("%s님이 댓글에 답글을 남겼습니다.", commenterNickname)) // 알림 제목
+                .content(replyContent) // 답글 내용
+                .url("/posts/" + post.getId())
+                .type(NotificationType.REPLY) // 알림 타입
+                .build();
+
+        // 알림 서비스로 전송
+        notificationServiceFeignClient.sendNotification(notificationRequest, NotificationType.REPLY.name(), memberId);
     }
 }
 

@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.CommentPostRequest;
 import myaong.popolog.blogservice.dto.request.CommentUpdateRequest;
+import myaong.popolog.blogservice.dto.request.ReplyRequest;
 import myaong.popolog.blogservice.dto.response.CommentPostResponse;
 import myaong.popolog.blogservice.dto.response.CommentUpdateResponse;
+import myaong.popolog.blogservice.dto.response.ReplyResponse;
 import myaong.popolog.blogservice.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,13 +41,22 @@ public class CommentController {
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
     }
 
-    @Operation(summary = "댓글 삭제", description = "댓글 삭제")
+    @Operation(summary = "API 명세서 v0.4 line 42", description = "댓글 삭제")
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
             @RequestHeader("memberId") Long memberId,
             @PathVariable Long commentId) {
         commentService.deleteComment(memberId, commentId);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
+    }
+
+    @Operation(summary = "API 명세서 v0.4 line 43", description = "답글 작성")
+    @PostMapping("/replies")
+    public ResponseEntity<ApiResponse<ReplyResponse>> postReply(
+            @RequestHeader("memberId") Long memberId,
+            @RequestBody @Valid ReplyRequest request) {
+        ReplyResponse response = commentService.postReply(memberId, request);
+        return ResponseEntity.ok(ApiResponse.onSuccess(response));
     }
 
 }
