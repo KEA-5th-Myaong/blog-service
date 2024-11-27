@@ -7,8 +7,8 @@ import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
 import myaong.popolog.blogservice.dto.request.UpdateProfileRequest;
+import myaong.popolog.blogservice.dto.response.FollowResponse;
 import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
-import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.repository.FollowRepository;
@@ -77,26 +77,31 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	}
 
 	@Override
-	public ProfileResponse.FollowDTO followProfile(Long memberId) {
-		// 일단 팔로우하는 사람은 id가 5인 member
-		Profile followingProfile = profileQueryService.findById(5L);
+	public FollowResponse followProfile(Long requesterId, Long memberId) {
+
+		// 자기 자신에 대해 요청할 수 없음
+		if (requesterId.equals(memberId)) {
+			throw new ApiException(ApiCode.SELF_FOLLOW_CONFLICT);
+		}
+
+		Profile followingProfile = profileQueryService.findById(requesterId);
 		Profile followedProfile = profileQueryService.findById(memberId);
 
 		boolean isExist = followRepository.existsByFollowingAndFollowed(followingProfile, followedProfile);
 
-		ProfileResponse.FollowDTO followDTO;
+		FollowResponse followResponse;
 
 		// 팔로우 내역이 이미 존재하면 팔로우 취소
 		if (isExist) {
 			followRepository.deleteByFollowingAndFollowed(followingProfile, followedProfile);
-			followDTO = ProfileConverter.toFollowDTO(false);
+			followResponse = profileConverter.toFollowResponse(false);
 
 		} else { // 새로 팔로우 정보 등록
-			Follow follow = ProfileConverter.toFollow(followingProfile, followedProfile);
+			Follow follow = profileConverter.toFollow(followingProfile, followedProfile);
 			followRepository.save(follow);
-			followDTO = ProfileConverter.toFollowDTO(true);
+			followResponse = profileConverter.toFollowResponse(true);
 		}
 
-		return followDTO;
+		return followResponse;
 	}
 }

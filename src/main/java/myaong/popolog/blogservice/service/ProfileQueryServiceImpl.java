@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
+import myaong.popolog.blogservice.dto.SortedEntity;
+import myaong.popolog.blogservice.dto.response.FollowersResponse;
+import myaong.popolog.blogservice.dto.response.FollowingsResponse;
 import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
@@ -13,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Service
 @RequiredArgsConstructor
@@ -69,27 +70,31 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 	/***** follow 관련 메소드 *****/
 
 	@Override
-	public ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId) {
-		// 1부터 10까지의 ID 리스트 생성
-		List<Long> ids = LongStream.rangeClosed(1, 10)
-				.boxed()
-				.collect(Collectors.toList());
+	public FollowingsResponse getProfileFollowingList(Long requesterId, Long memberId, Long lastId) {
 
-		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
+		Profile requester = requesterId != null
+				? findById(requesterId)
+				: null;
 
-		return ProfileConverter.toFollowingListDTO(findProfileList);
+		Profile member = findById(memberId);
+
+		List<SortedEntity<Profile>> sortedProfileList = profileRepository.findProfilesFollowedBy(member, lastId.equals(0L) ? null : lastId);
+
+		return profileConverter.toFollowingsResponse(sortedProfileList, requester);
 	}
 
 	@Override
-	public ProfileResponse.FollowedListDTO getProfileFollowedList(Long memberId, Long lastId) {
-		// 1부터 10까지의 ID 리스트 생성
-		List<Long> ids = LongStream.rangeClosed(1, 10)
-				.boxed()
-				.collect(Collectors.toList());
+	public FollowersResponse getProfileFollowedList(Long requesterId, Long memberId, Long lastId) {
 
-		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
+		Profile requester = requesterId != null
+				? findById(requesterId)
+				: null;
 
-		return ProfileConverter.toFollowedListDTO(findProfileList);
+		Profile member = findById(memberId);
+
+		List<SortedEntity<Profile>> sortedProfileList = profileRepository.findProfilesFollowing(member, lastId.equals(0L) ? null : lastId);
+
+		return profileConverter.toFollowersResponse(sortedProfileList, requester);
 	}
 
 	@Override
