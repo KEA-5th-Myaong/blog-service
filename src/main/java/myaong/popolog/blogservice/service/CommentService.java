@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.dto.request.CommentPostRequest;
+import myaong.popolog.blogservice.dto.request.CommentUpdateRequest;
 import myaong.popolog.blogservice.dto.response.CommentPostResponse;
+import myaong.popolog.blogservice.dto.response.CommentUpdateResponse;
 import myaong.popolog.blogservice.entity.Comment;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
@@ -62,6 +64,36 @@ public class CommentService {
                 .commentId(comment.getId().intValue())
                 .build();
     }
+
+    @Transactional
+    public CommentUpdateResponse updateComment(Long memberId, Long commentId, CommentUpdateRequest request) {
+
+        // 댓글 조회
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
+
+        // 댓글 작성자 확인
+        if (!comment.getProfile().getId().equals(memberId)) {
+            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
+        }
+
+        // 댓글 내용 검증
+        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
+            throw new ApiException(ApiCode.INVALID_DATA);
+        }
+
+        // 기존 댓글 내용 수정
+        comment.updateContent(request.getContent());
+        commentRepository.save(comment);
+
+        // 수정 결과 반환
+        return CommentUpdateResponse.builder()
+                .commentId(comment.getId()) // Long 타입 그대로 사용
+                .build();
+    }
+
+
+
 
     // 알림 전송 메서드
     private void sendNotificationToPostOwner(Post post, String commenterNickname, String commentContent, Long memberId) {

@@ -5,7 +5,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.CommentPostRequest;
+import myaong.popolog.blogservice.dto.request.CommentUpdateRequest;
 import myaong.popolog.blogservice.dto.response.CommentPostResponse;
+import myaong.popolog.blogservice.dto.response.CommentUpdateResponse;
 import myaong.popolog.blogservice.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,4 +28,15 @@ public class CommentController {
         CommentPostResponse response = commentService.postComment(memberId, request);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
     }
+
+    @Operation(summary = "API 명세서 v0.4 line 41", description = "댓글 수정")
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<ApiResponse<CommentUpdateResponse>> updateComment(
+            @RequestHeader("memberId") Long memberId,
+            @PathVariable Long commentId,
+            @RequestBody @Valid CommentUpdateRequest request) {
+        CommentUpdateResponse response = commentService.updateComment(memberId, commentId, request);
+        return ResponseEntity.ok(ApiResponse.onSuccess(response));
+    }
+
 }
