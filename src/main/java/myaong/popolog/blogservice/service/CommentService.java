@@ -23,7 +23,8 @@ public class CommentService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final ProfileRepository profileRepository; // ProfileRepository 의존성 추가
+    private final ProfileRepository profileRepository;
+    private final NotificationServiceFeignClient notificationServiceFeignClient;
 
     @Transactional
     public CommentPostResponse postComment(Long memberId, CommentPostRequest request) {
@@ -51,11 +52,31 @@ public class CommentService {
 
         commentRepository.save(comment);
 
+        // 댓글 작성자가 게시물 작성자가 아닐 경우 알림 전송
+        if (!post.getProfile().getId().equals(memberId)) {
+            sendNotificationToPostOwner(post, commenterProfile.getNickname(), request.getContent(), memberId);
+        }
+
         // 댓글 작성 결과 반환
         return CommentPostResponse.builder()
                 .commentId(comment.getId().intValue())
                 .build();
     }
+
+    // 알림 전송 메서드
+    private void sendNotificationToPostOwner(Post post, String commenterNickname, String commentContent, Long memberId) {
+        NotificationRequest notificationRequest = NotificationRequest.builder()
+                .memberId(post.getProfile().getId())
+                .title(String.format("%s님이 게시물에 댓글을 남겼습니다.", commenterNickname)) // 알림 제목
+                .content(commentContent)
+                .url("/posts/" + post.getId())
+                .type(NotificationType.COMMENT)
+                .build();
+
+        // 알림 서비스로 전송
+        notificationServiceFeignClient.sendNotification(notificationRequest, NotificationType.COMMENT.name(), memberId);
+    }
 }
+
 
 
