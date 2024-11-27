@@ -3,28 +3,36 @@ package myaong.popolog.blogservice.service;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
+import myaong.popolog.blogservice.dto.response.LikeResponse;
 import myaong.popolog.blogservice.dto.response.PostDetailResponse;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Comment;
+import myaong.popolog.blogservice.entity.Like;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
-import myaong.popolog.blogservice.repository.BookmarkRepository;
-import myaong.popolog.blogservice.repository.CommentRepository;
-import myaong.popolog.blogservice.repository.PostRepository;
+import myaong.popolog.blogservice.feign.client.NotificationServiceFeignClient;
+import myaong.popolog.blogservice.feign.constant.NotificationType;
+import myaong.popolog.blogservice.feign.dto.request.NotificationRequest;
+import myaong.popolog.blogservice.feign.service.NotificationFeignService;
+import myaong.popolog.blogservice.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class PostsService {
 
+	private final LikeRepository likeRepository;
 	private final PostRepository postRepository;
 	private final BookmarkRepository bookmarkRepository;
 	private final CommentRepository commentRepository;
+	private final NotificationFeignService notificationFeignService;
+	private final ProfileRepository profileRepository;
 
 	@Transactional(readOnly = true)
 	public PostsResponse getPostsOf(Long memberId, Long lastId) {
@@ -74,4 +82,51 @@ public class PostsService {
 
 		return PostDetailResponse.of(post, comments, isBookmarked);
 	}
+
+	// 좋아요 토글
+	@Transactional
+	public LikeResponse toggleLike(Long postId, Long memberId) {
+		// 게시물 조회
+		Post post = postRepository.findById(postId)
+				.orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+		// 기존 좋아요 여부 확인
+		Optional<Like> existingLike = likeRepository.findByPostIdAndMemberId(postId, memberId);
+
+		boolean isLiked;
+
+		if (existingLike.isPresent()) {
+			likeRepository.delete(existingLike.get());
+			isLiked = false;
+		} else {
+			Like like = Like.builder()
+					.post(post)
+					.memberId(memberId)
+					.build();
+			likeRepository.save(like);
+			isLiked = true;
+
+			sendLikeNotification(post, memberId);
+		}
+
+		return LikeResponse.builder()
+				.like(isLiked)
+				.build();
+	}
+
+	private void sendLikeNotification(Post post, Long memberId) {
+		// 좋아요를 누른 사용자의 닉네임 가져오기
+		String likerNickname = profileRepository.findById(memberId)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND))
+				.getNickname(); // 닉네임 가져오기
+
+		// 알림 제목 생성
+		String title = String.format("%s님이 회원님의 게시물을 좋아합니다!", likerNickname);
+		String url = "/posts/" + post.getId(); // 게시물 URL
+		Long targetMemberId = post.getProfile().getId();
+
+		// 알림 전송
+		notificationFeignService.sendNotification(targetMemberId, title, null, url, NotificationType.LIKE, memberId);
+	}
 }
+

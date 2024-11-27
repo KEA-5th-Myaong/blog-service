@@ -13,9 +13,8 @@ import myaong.popolog.blogservice.dto.response.ReplyResponse;
 import myaong.popolog.blogservice.entity.Comment;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
-import myaong.popolog.blogservice.feign.client.NotificationServiceFeignClient;
 import myaong.popolog.blogservice.feign.constant.NotificationType;
-import myaong.popolog.blogservice.feign.dto.request.NotificationRequest;
+import myaong.popolog.blogservice.feign.service.NotificationFeignService;
 import myaong.popolog.blogservice.repository.CommentRepository;
 import myaong.popolog.blogservice.repository.PostRepository;
 import myaong.popolog.blogservice.repository.ProfileRepository;
@@ -28,7 +27,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ProfileRepository profileRepository;
-    private final NotificationServiceFeignClient notificationServiceFeignClient;
+    private final NotificationFeignService notificationFeignService;
 
     // 댓글 작성
     @Transactional
@@ -179,32 +178,18 @@ public class CommentService {
                 .build();
     }
 
-    // 공통 알림 전송 메서드
-    private void sendNotification(Long targetMemberId, String title, String content, String url, NotificationType type, Long senderId) {
-        NotificationRequest notificationRequest = NotificationRequest.builder()
-                .memberId(targetMemberId) // 대상 사용자 ID
-                .title(title) // 알림 제목
-                .content(content) // 알림 내용
-                .url(url) // URL
-                .type(type) // 알림 타입
-                .build();
-
-        // 알림 서비스로 전송
-        notificationServiceFeignClient.sendNotification(notificationRequest, type.name(), senderId);
-    }
-
-    // 게시물 작성자에게 알림 전송
     private void sendNotificationToPostOwner(Post post, String commenterNickname, String commentContent, Long memberId) {
         String title = String.format("%s님이 게시물에 댓글을 남겼습니다.", commenterNickname);
         String url = "/posts/" + post.getId();
-        sendNotification(post.getProfile().getId(), title, commentContent, url, NotificationType.COMMENT, memberId);
+
+        notificationFeignService.sendNotification(post.getProfile().getId(), title, commentContent, url, NotificationType.COMMENT, memberId);
     }
 
-    // 댓글 작성자에게 알림 전송
     private void sendNotificationToCommentOwner(Post post, Comment parentComment, String commenterNickname, String replyContent, Long memberId) {
         String title = String.format("%s님이 댓글에 답글을 남겼습니다.", commenterNickname);
         String url = "/posts/" + post.getId();
-        sendNotification(parentComment.getProfile().getId(), title, replyContent, url, NotificationType.REPLY, memberId);
+
+        notificationFeignService.sendNotification(parentComment.getProfile().getId(), title, replyContent, url, NotificationType.REPLY, memberId);
     }
 
     // 답글 작성 시 게시물 작성자와 댓글 작성자 모두에게 알림 전송
