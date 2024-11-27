@@ -144,12 +144,20 @@ public class CommentService {
             );
         }
 
+        // 게시물 작성자에게도 알림 전송 (답글에 대한 알림)
+        sendNotificationsForReply(
+                parentComment.getPost(),
+                parentComment,
+                commenterProfile.getNickname(),
+                request.getContent(),
+                memberId
+        );
+
         // 답글 작성 결과 반환
         return ReplyResponse.builder()
                 .commentId(reply.getId())
                 .build();
     }
-
 
 
     // 답글 삭제
@@ -163,14 +171,14 @@ public class CommentService {
         }
 
         if (reply.getParentComment() == null) {
-            throw new ApiException(ApiCode.INVALID_DATA); // 답글이 아닌 경우
+            throw new ApiException(ApiCode.INVALID_DATA);
         }
-        // 답글 삭제
+
         commentRepository.delete(reply);
     }
 
 
-    // 알림 전송 메서드
+    // 공통 알림 전송 메서드
     private void sendNotification(Long targetMemberId, String title, String content, String url, NotificationType type, Long senderId) {
         NotificationRequest notificationRequest = NotificationRequest.builder()
                 .memberId(targetMemberId) // 대상 사용자 ID
@@ -197,7 +205,17 @@ public class CommentService {
         String url = "/posts/" + post.getId();
         sendNotification(parentComment.getProfile().getId(), title, replyContent, url, NotificationType.REPLY, memberId);
     }
-}
 
+    // 답글 작성 시 게시물 작성자와 댓글 작성자 모두에게 알림 전송
+    private void sendNotificationsForReply(Post post, Comment parentComment, String commenterNickname, String replyContent, Long memberId) {
+        // 댓글 작성자에게 알림 전송
+        sendNotificationToCommentOwner(post, parentComment, commenterNickname, replyContent, memberId);
+
+        // 게시물 작성자가 댓글 작성자와 다를 경우에만 알림 전송
+        if (!post.getProfile().getId().equals(parentComment.getProfile().getId())) {
+            sendNotificationToPostOwner(post, commenterNickname, replyContent, memberId);
+        }
+    }
+}
 
 

@@ -63,8 +63,8 @@ public class CommentController {
     @DeleteMapping("replies/{replyId}")
     public ResponseEntity<ApiResponse<Void>> deleteReply(
             @RequestHeader("memberId") Long memberId,
-            @PathVariable Long replyId) {
-        commentService.deleteReply(memberId, replyId);
+            @PathVariable Long commentId) {
+        commentService.deleteReply(memberId, commentId);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 }
