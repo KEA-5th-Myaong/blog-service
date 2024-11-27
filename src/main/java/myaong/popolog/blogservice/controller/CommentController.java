@@ -39,4 +39,13 @@ public class CommentController {
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
     }
 
+    @Operation(summary = "댓글 삭제", description = "댓글 삭제")
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<ApiResponse<Void>> deleteComment(
+            @RequestHeader("memberId") Long memberId,
+            @PathVariable Long commentId) {
+        commentService.deleteComment(memberId, commentId);
+        return ResponseEntity.ok(ApiResponse.onSuccess(null));
+    }
+
 }

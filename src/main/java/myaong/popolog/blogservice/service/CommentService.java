@@ -68,7 +68,6 @@ public class CommentService {
     @Transactional
     public CommentUpdateResponse updateComment(Long memberId, Long commentId, CommentUpdateRequest request) {
 
-        // 댓글 조회
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
 
@@ -88,7 +87,7 @@ public class CommentService {
 
         // 수정 결과 반환
         return CommentUpdateResponse.builder()
-                .commentId(comment.getId()) // Long 타입 그대로 사용
+                .commentId(comment.getId())
                 .build();
     }
 
@@ -107,6 +106,17 @@ public class CommentService {
 
         // 알림 서비스로 전송
         notificationServiceFeignClient.sendNotification(notificationRequest, NotificationType.COMMENT.name(), memberId);
+    }
+
+
+    @Transactional
+    public void deleteComment(Long memberId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
+        if (!comment.getProfile().getId().equals(memberId)) {
+            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
+        }
+        commentRepository.delete(comment);
     }
 }
 
