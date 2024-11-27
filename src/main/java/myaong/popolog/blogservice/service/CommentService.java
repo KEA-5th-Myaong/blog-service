@@ -106,6 +106,7 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+    // 답글 작성
     @Transactional
     public ReplyResponse postReply(Long memberId, ReplyRequest request) {
         // 부모 댓글 조회
@@ -148,6 +149,26 @@ public class CommentService {
                 .commentId(reply.getId())
                 .build();
     }
+
+
+
+    // 답글 삭제
+    @Transactional
+    public void deleteReply(Long memberId, Long commentId) {
+        Comment reply = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
+
+        if (!reply.getProfile().getId().equals(memberId)) {
+            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
+        }
+
+        if (reply.getParentComment() == null) {
+            throw new ApiException(ApiCode.INVALID_DATA); // 답글이 아닌 경우
+        }
+        // 답글 삭제
+        commentRepository.delete(reply);
+    }
+
 
     // 알림 전송 메서드
     private void sendNotification(Long targetMemberId, String title, String content, String url, NotificationType type, Long senderId) {
