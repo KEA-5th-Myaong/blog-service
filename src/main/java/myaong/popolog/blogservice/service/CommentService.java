@@ -95,23 +95,6 @@ public class CommentService {
                 .build();
     }
 
-
-
-
-    // 알림 전송 메서드
-    private void sendNotificationToPostOwner(Post post, String commenterNickname, String commentContent, Long memberId) {
-        NotificationRequest notificationRequest = NotificationRequest.builder()
-                .memberId(post.getProfile().getId())
-                .title(String.format("%s님이 게시물에 댓글을 남겼습니다.", commenterNickname)) // 알림 제목
-                .content(commentContent)
-                .url("/posts/" + post.getId())
-                .type(NotificationType.COMMENT)
-                .build();
-
-        // 알림 서비스로 전송
-        notificationServiceFeignClient.sendNotification(notificationRequest, NotificationType.COMMENT.name(), memberId);
-    }
-
     // 댓글 삭제
     @Transactional
     public void deleteComment(Long memberId, Long commentId) {
@@ -166,19 +149,32 @@ public class CommentService {
                 .build();
     }
 
-
     // 알림 전송 메서드
-    private void sendNotificationToCommentOwner(Post post, Comment parentComment, String commenterNickname, String replyContent, Long memberId) {
+    private void sendNotification(Long targetMemberId, String title, String content, String url, NotificationType type, Long senderId) {
         NotificationRequest notificationRequest = NotificationRequest.builder()
-                .memberId(parentComment.getProfile().getId()) // 부모 댓글 작성자 ID
-                .title(String.format("%s님이 댓글에 답글을 남겼습니다.", commenterNickname)) // 알림 제목
-                .content(replyContent) // 답글 내용
-                .url("/posts/" + post.getId())
-                .type(NotificationType.REPLY) // 알림 타입
+                .memberId(targetMemberId) // 대상 사용자 ID
+                .title(title) // 알림 제목
+                .content(content) // 알림 내용
+                .url(url) // URL
+                .type(type) // 알림 타입
                 .build();
 
         // 알림 서비스로 전송
-        notificationServiceFeignClient.sendNotification(notificationRequest, NotificationType.REPLY.name(), memberId);
+        notificationServiceFeignClient.sendNotification(notificationRequest, type.name(), senderId);
+    }
+
+    // 게시물 작성자에게 알림 전송
+    private void sendNotificationToPostOwner(Post post, String commenterNickname, String commentContent, Long memberId) {
+        String title = String.format("%s님이 게시물에 댓글을 남겼습니다.", commenterNickname);
+        String url = "/posts/" + post.getId();
+        sendNotification(post.getProfile().getId(), title, commentContent, url, NotificationType.COMMENT, memberId);
+    }
+
+    // 댓글 작성자에게 알림 전송
+    private void sendNotificationToCommentOwner(Post post, Comment parentComment, String commenterNickname, String replyContent, Long memberId) {
+        String title = String.format("%s님이 댓글에 답글을 남겼습니다.", commenterNickname);
+        String url = "/posts/" + post.getId();
+        sendNotification(parentComment.getProfile().getId(), title, replyContent, url, NotificationType.REPLY, memberId);
     }
 }
 
