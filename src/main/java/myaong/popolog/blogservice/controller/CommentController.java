@@ -58,13 +58,25 @@ public class CommentController {
         ReplyResponse response = commentService.postReply(memberId, request);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
     }
-    
+
+    @Operation(summary = "API 명세서 v0.4 line 44", description = "답글 수정")
+    @PutMapping("/replies/{replyId}")
+    public ResponseEntity<ApiResponse<ReplyResponse>> updateReply(
+            @RequestHeader("memberId") Long memberId,
+            @PathVariable Long replyId,
+            @RequestBody @Valid ReplyRequest request) {
+        ReplyResponse response = commentService.updateReply(memberId, replyId, request);
+        return ResponseEntity.ok(ApiResponse.onSuccess(response));
+    }
+
+
     @Operation(summary = "API 명세서 v0.4 line 45", description = "답글 삭제")
     @DeleteMapping("replies/{replyId}")
     public ResponseEntity<ApiResponse<Void>> deleteReply(
             @RequestHeader("memberId") Long memberId,
-            @PathVariable Long commentId) {
-        commentService.deleteReply(memberId, commentId);
+            @PathVariable Long replyId) {
+        commentService.deleteReply(memberId, replyId);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
+
 }

@@ -68,40 +68,13 @@ public class CommentService {
                 .build();
     }
 
-    // 댓글 수정
-    @Transactional
-    public CommentUpdateResponse updateComment(Long memberId, Long commentId, CommentUpdateRequest request) {
-
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
-
-        // 댓글 작성자 확인
-        if (!comment.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
-        }
-
-        // 댓글 내용 검증
-        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-            throw new ApiException(ApiCode.INVALID_DATA);
-        }
-
-        // 기존 댓글 내용 수정
-        comment.updateContent(request.getContent());
-        commentRepository.save(comment);
-
-        // 수정 결과 반환
-        return CommentUpdateResponse.builder()
-                .commentId(comment.getId())
-                .build();
-    }
-
     // 댓글 삭제
     @Transactional
     public void deleteComment(Long memberId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
         if (!comment.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
+            throw new ApiException(ApiCode.READ_ONLY_ACCESS);
         }
         commentRepository.delete(comment);
     }
@@ -109,15 +82,12 @@ public class CommentService {
     // 답글 작성
     @Transactional
     public ReplyResponse postReply(Long memberId, ReplyRequest request) {
-        // 부모 댓글 조회
         Comment parentComment = commentRepository.findById(request.getCommentId())
                 .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
 
         // 답글 작성자 프로필 조회
         Profile commenterProfile = profileRepository.findById(memberId)
                 .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
-
-        // 답글 내용 검증
         if (request.getContent().trim().isEmpty()) {
             throw new ApiException(ApiCode.INVALID_DATA);
         }
@@ -159,7 +129,6 @@ public class CommentService {
                 .build();
     }
 
-
     // 답글 삭제
     @Transactional
     public void deleteReply(Long memberId, Long commentId) {
@@ -167,7 +136,7 @@ public class CommentService {
                 .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
 
         if (!reply.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
+            throw new ApiException(ApiCode.READ_ONLY_ACCESS);
         }
 
         if (reply.getParentComment() == null) {
@@ -177,6 +146,38 @@ public class CommentService {
         commentRepository.delete(reply);
     }
 
+    // 수정 로직
+    private Comment updateContent(Long memberId, Long commentId, String newContent) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
+        if (!comment.getProfile().getId().equals(memberId)) {
+            throw new ApiException(ApiCode.READ_ONLY_ACCESS);
+        }
+        if (newContent == null || newContent.trim().isEmpty()) {
+            throw new ApiException(ApiCode.INVALID_DATA);
+        }
+        comment.updateContent(newContent);
+        commentRepository.save(comment);
+        return comment;
+    }
+
+    // 댓글 수정
+    @Transactional
+    public CommentUpdateResponse updateComment(Long memberId, Long commentId, CommentUpdateRequest request) {
+        Comment updatedComment = updateContent(memberId, commentId, request.getContent());
+        return CommentUpdateResponse.builder()
+                .commentId(updatedComment.getId())
+                .build();
+    }
+
+    // 답글 수정
+    @Transactional
+    public ReplyResponse updateReply(Long memberId, Long replyId, ReplyRequest request) {
+        Comment updatedReply = updateContent(memberId, replyId, request.getContent());
+        return ReplyResponse.builder()
+                .commentId(updatedReply.getId())
+                .build();
+    }
 
     // 공통 알림 전송 메서드
     private void sendNotification(Long targetMemberId, String title, String content, String url, NotificationType type, Long senderId) {
