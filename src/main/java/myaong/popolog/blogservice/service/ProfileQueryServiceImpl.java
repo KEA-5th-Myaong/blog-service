@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
+import myaong.popolog.blogservice.dto.SortedEntity;
+import myaong.popolog.blogservice.dto.response.FollowersResponse;
+import myaong.popolog.blogservice.dto.response.FollowingsResponse;
+import myaong.popolog.blogservice.dto.response.ProfileInfoResponse;
 import myaong.popolog.blogservice.dto.response.ProfileResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
@@ -12,44 +16,85 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ProfileQueryServiceImpl implements ProfileQueryService {
 
 	private final ProfileRepository profileRepository;
+	private final ProfileConverter profileConverter;
 
 	@Override
-	public ProfileResponse.FollowingListDTO getProfileFollowingList(Long memberId, Long lastId) {
-		// 1부터 10까지의 ID 리스트 생성
-		List<Long> ids = LongStream.rangeClosed(1, 10)
-				.boxed()
-				.collect(Collectors.toList());
-
-		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
-
-		return ProfileConverter.toFollowingListDTO(findProfileList);
+	public Boolean existsById(Long memberId) {
+		return profileRepository.existsById(memberId);
 	}
 
 	@Override
-	public ProfileResponse.FollowedListDTO getProfileFollowedList(Long memberId, Long lastId) {
-		// 1부터 10까지의 ID 리스트 생성
-		List<Long> ids = LongStream.rangeClosed(1, 10)
-				.boxed()
-				.collect(Collectors.toList());
-
-		List<Profile> findProfileList = profileRepository.findByIdIn(ids);
-
-		return ProfileConverter.toFollowedListDTO(findProfileList);
-	}
-
-	@Override
-	public Profile findProfileByMemberId(Long memberId) {
+	public Profile findById(Long memberId) {
 		return profileRepository.findById(memberId)
 				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public Profile findByUsername(String username) {
+		return profileRepository.findByUsername(username)
+				.orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+	}
+
+	@Override
+	public ProfileResponse getProfileByMemberId(Long memberId) {
+
+		Profile profile = findById(memberId);
+
+		return profileConverter.toProfileResponseByMemberId(profile);
+	}
+
+	@Override
+	public ProfileInfoResponse getProfileInfo(Long requesterId, Long memberId) {
+
+		Profile requester = findById(requesterId);
+		Profile profile = findById(memberId);
+
+		return profileConverter.toProfileInfoResponse(requester, profile);
+	}
+
+	@Override
+	public ProfileResponse getProfileByUsername(String username) {
+
+		Profile profile = findByUsername(username);
+
+		return profileConverter.toProfileResponseByUsername(profile);
+	}
+
+	/***** follow 관련 메소드 *****/
+
+	@Override
+	public FollowingsResponse getProfileFollowingList(Long requesterId, Long memberId, Long lastId) {
+
+		Profile requester = requesterId != null
+				? findById(requesterId)
+				: null;
+
+		Profile member = findById(memberId);
+
+		List<SortedEntity<Profile>> sortedProfileList = profileRepository.findProfilesFollowedBy(member, lastId.equals(0L) ? null : lastId);
+
+		return profileConverter.toFollowingsResponse(sortedProfileList, requester);
+	}
+
+	@Override
+	public FollowersResponse getProfileFollowedList(Long requesterId, Long memberId, Long lastId) {
+
+		Profile requester = requesterId != null
+				? findById(requesterId)
+				: null;
+
+		Profile member = findById(memberId);
+
+		List<SortedEntity<Profile>> sortedProfileList = profileRepository.findProfilesFollowing(member, lastId.equals(0L) ? null : lastId);
+
+		return profileConverter.toFollowersResponse(sortedProfileList, requester);
 	}
 
 	@Override
