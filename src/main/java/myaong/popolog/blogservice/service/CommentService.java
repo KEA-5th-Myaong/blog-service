@@ -45,7 +45,6 @@ public class CommentService {
         // 댓글 작성자 프로필 조회
         Profile commenterProfile = profileRepository.findById(memberId)
                 .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
-
         // 댓글 저장
         Comment comment = Comment.builder()
                 .post(post)
@@ -58,7 +57,7 @@ public class CommentService {
 
         // 댓글 작성자가 게시물 작성자가 아닐 경우 알림 전송
         if (!post.getProfile().getId().equals(memberId)) {
-            sendNotificationToPostOwner(post, commenterProfile.getNickname(), request.getContent(), memberId);
+            sendNotificationToPostOwner(post, null, commenterProfile.getNickname(), request.getContent(), memberId, NotificationType.COMMENT);
         }
 
         // 댓글 작성 결과 반환
@@ -113,13 +112,14 @@ public class CommentService {
             );
         }
 
-        // 게시물 작성자에게도 알림 전송 (답글에 대한 알림)
-        sendNotificationsForReply(
+        // 게시물 작성자에게도 답글 알림 전송
+        sendNotificationToPostOwner(
                 parentComment.getPost(),
                 parentComment,
                 commenterProfile.getNickname(),
                 request.getContent(),
-                memberId
+                memberId,
+                NotificationType.REPLY
         );
 
         // 답글 작성 결과 반환
@@ -127,6 +127,7 @@ public class CommentService {
                 .commentId(reply.getId())
                 .build();
     }
+
 
     // 답글 삭제
     @Transactional
@@ -178,29 +179,29 @@ public class CommentService {
                 .build();
     }
 
-    private void sendNotificationToPostOwner(Post post, String commenterNickname, String commentContent, Long memberId) {
-        String title = String.format("%s님이 게시물에 댓글을 남겼습니다.", commenterNickname);
+    private void sendNotificationToPostOwner(Post post, Comment parentComment, String commenterNickname, String content, Long memberId, NotificationType notificationType) {
+        String title;
+
+        // 알림 제목 생성
+        if (notificationType == NotificationType.REPLY) {
+            title = String.format("%s님이 %s님의 댓글에 답글을 남겼습니다.",
+                    commenterNickname,
+                    parentComment.getProfile().getNickname());
+        } else {
+            title = String.format("%s님이 게시물에 댓글을 남겼습니다.", commenterNickname);
+        }
+
+        // URL 생성
         String url = "/posts/" + post.getId();
 
-        notificationFeignService.sendNotification(post.getProfile().getId(), title, commentContent, url, NotificationType.COMMENT, memberId);
+        // 알림 전송
+        notificationFeignService.sendNotification(post.getProfile().getId(), title, content, url, notificationType, memberId);
     }
-
     private void sendNotificationToCommentOwner(Post post, Comment parentComment, String commenterNickname, String replyContent, Long memberId) {
         String title = String.format("%s님이 댓글에 답글을 남겼습니다.", commenterNickname);
         String url = "/posts/" + post.getId();
 
         notificationFeignService.sendNotification(parentComment.getProfile().getId(), title, replyContent, url, NotificationType.REPLY, memberId);
-    }
-
-    // 답글 작성 시 게시물 작성자와 댓글 작성자 모두에게 알림 전송
-    private void sendNotificationsForReply(Post post, Comment parentComment, String commenterNickname, String replyContent, Long memberId) {
-        // 댓글 작성자에게 알림 전송
-        sendNotificationToCommentOwner(post, parentComment, commenterNickname, replyContent, memberId);
-
-        // 게시물 작성자가 댓글 작성자와 다를 경우에만 알림 전송
-        if (!post.getProfile().getId().equals(parentComment.getProfile().getId())) {
-            sendNotificationToPostOwner(post, commenterNickname, replyContent, memberId);
-        }
     }
 }
 

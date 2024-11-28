@@ -124,7 +124,7 @@ public class PostsService {
 		Long targetMemberId = post.getProfile().getId();
 
 		// 알림 전송
-		notificationFeignService.sendNotification(targetMemberId, title, null, url, NotificationType.LIKE, memberId);
+		notificationFeignService.sendNotification(targetMemberId, title, "", url, NotificationType.LIKE, memberId);
 	}
 }
 
