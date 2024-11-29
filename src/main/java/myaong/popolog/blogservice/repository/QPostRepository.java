@@ -1,6 +1,6 @@
 package myaong.popolog.blogservice.repository;
 
-import com.querydsl.core.Tuple;
+import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
 
@@ -16,7 +16,7 @@ public interface QPostRepository {
 
 	List<Post> findByFollowing(Profile member, Long lastId);
 
-	List<Tuple> findByProfile_Bookmark(Profile member);
+	List<SortedEntity<Post>> findByProfile_Bookmark(Profile member);
 
-	List<Tuple> findByProfile_Bookmark(Profile member, Long lastId);
+	List<SortedEntity<Post>> findByProfile_Bookmark(Profile member, Long lastId);
 }
