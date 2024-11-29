@@ -11,6 +11,8 @@ import myaong.popolog.blogservice.dto.response.FollowResponse;
 import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
 import myaong.popolog.blogservice.entity.Follow;
 import myaong.popolog.blogservice.entity.Profile;
+import myaong.popolog.blogservice.feign.constant.NotificationType;
+import myaong.popolog.blogservice.feign.service.NotificationFeignService;
 import myaong.popolog.blogservice.repository.FollowRepository;
 import myaong.popolog.blogservice.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	private final FollowRepository followRepository;
 	private final ProfileConverter profileConverter;
 	private final S3ApiService s3ApiService;
+	private final NotificationFeignService notificationFeignService;
 
 	@Override
 	public void createProfile(NewProfileRequest newProfileRequest) {
@@ -100,8 +103,21 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 			Follow follow = profileConverter.toFollow(followingProfile, followedProfile);
 			followRepository.save(follow);
 			followResponse = profileConverter.toFollowResponse(true);
-		}
 
+			// 알림 전송 (직접 호출)
+			String title = String.format("%s님이 당신을 팔로우합니다!", followingProfile.getNickname());
+			String content = ""; //content가 notNull이라 임시조치
+			String url = "/profiles/" + followingProfile.getId();
+
+			notificationFeignService.sendNotification(
+					followedProfile.getId(),
+					title,
+					content,
+					url,
+					NotificationType.FOLLOW,
+					followingProfile.getId()
+			);
+		}
 		return followResponse;
 	}
 }
