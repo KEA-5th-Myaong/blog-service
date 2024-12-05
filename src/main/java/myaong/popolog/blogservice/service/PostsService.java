@@ -32,41 +32,60 @@ public class PostsService {
 	private final NotificationFeignService notificationFeignService;
 	private final ProfileRepository profileRepository;
 
+	// 블로그 포스트 목록 조회
 	@Transactional(readOnly = true)
 	public PostsResponse getPostsOf(Long memberId, Long lastId) {
-
+		// lastId 검증
+		validateLastId(lastId);
+		// 회원 프로필 검증
+		validateProfileExists(memberId);
+		// 게시물 조회
 		List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
-
+		// 응답 데이터 준비
 		List<PostsResponse.Posts> posts = new ArrayList<>();
 		long minId = Long.MAX_VALUE;
-
 		for (Post p : postList) {
-
 			Long postId = p.getId();
-
 			if (postId.compareTo(minId) < 0) {
 				minId = postId;
 			}
+			boolean isBookmarked = bookmarkRepository.existsByPostAndMemberId(p, memberId);
 			PostsResponse.Posts post = PostsResponse.Posts.builder()
 					.postId(postId)
 					.title(p.getTitle())
-					.content(p.getContent())
+					.content(truncateContent(p.getContent()))
 					.timestamp(p.getCreatedAt())
-					.memberId(p.getProfile().getId())
-					.username(p.getProfile().getUsername())
-					.nickname(p.getProfile().getNickname())
-					.profilePicUrl(p.getProfile().getProfilePicUrl())
-					.isBookmarked(bookmarkRepository.existsByPostAndProfile(p, new Profile(memberId, "", "", "", "", "")))
+					.likeCount(p.getLikes().size())
+					.isBookmarked(isBookmarked)
 					.build();
 			posts.add(post);
 		}
 
-		if (postList.size() < 10)
+		// 데이터가 더 이상 없는 경우 lastId를 -1로 설정
+		if (postList.size() < 10) {
 			minId = -1L;
-
+		}
 		return PostsResponse.builder()
 				.lastId(minId)
-				.posts(posts).build();
+				.posts(posts)
+				.build();
+	}
+	// lastId 값 검증 메서드
+	private void validateLastId(Long lastId) {
+		if (lastId < 0) {
+			throw new ApiException(ApiCode.INVALID_DATA);
+		}
+	}
+	// 회원 존재 여부 검증 메서드
+	private void validateProfileExists(Long memberId) {
+		boolean exists = profileRepository.existsById(memberId);
+		if (!exists) {
+			throw new ApiException(ApiCode.MEMBER_NOT_FOUND);
+		}
+	}
+	// 게시물 내용 400자 제한
+	private String truncateContent(String content) {
+		return content.length() > 400 ? content.substring(0, 400) : content;
 	}
 
 	@Transactional(readOnly = true)

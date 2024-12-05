@@ -17,13 +17,13 @@ public class PostsController {
 
 	private final PostsService postsService;
 
-	@Operation(summary = "API 명세서 v0.3 line 36", description = "블로그 포스트 목록 조회")
+	@Operation(summary = "API 명세서 v0.4 line 32", description = "블로그 포스트 목록 조회")
 	@GetMapping("/members/{memberId}/{lastId}")
-	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(@PathVariable String memberId,
-																 @PathVariable Long lastId) {
-
-		PostsResponse res = postsService.getPostsOf(lastId, 5L);
-
+	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(
+			@PathVariable Long memberId,
+			@PathVariable Long lastId
+	) {
+		PostsResponse res = postsService.getPostsOf(memberId, lastId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
