@@ -1,10 +1,10 @@
 package myaong.popolog.blogservice.service;
 
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.MainPageConverter;
+import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.dto.response.MainPageResponse;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Prejob;
@@ -78,7 +78,7 @@ public class MainPageServiceImpl implements MainPageService {
 
 		Profile member = profileQueryService.findById(memberId);
 
-		List<Tuple> tupleList;
+		List<SortedEntity<Post>> tupleList;
 		if (lastId.equals(0L)) {
 			tupleList = postRepository.findByProfile_Bookmark(member);
 		} else {

@@ -1,7 +1,7 @@
 package myaong.popolog.blogservice.converter;
 
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.dto.response.MainPageResponse;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
@@ -10,9 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static myaong.popolog.blogservice.entity.QBookmark.bookmark;
-import static myaong.popolog.blogservice.entity.QPost.post;
 
 @Component
 @RequiredArgsConstructor
@@ -69,19 +66,19 @@ public class MainPageConverter {
 				.posts(posts).build();
 	}
 
-	public MainPageResponse toMainPageResponseBookmarked(List<Tuple> tupleList) {
+	public MainPageResponse toMainPageResponseBookmarked(List<SortedEntity<Post>> tupleList) {
 
 		List<MainPageResponse.PostDTO> posts = new ArrayList<>();
 		long minId = Long.MAX_VALUE;
 
-		for (Tuple tuple : tupleList) {
+		for (SortedEntity<Post> tuple : tupleList) {
 
-			Long bookmarkId = tuple.get(bookmark.id);
+			Long bookmarkId = tuple.getKey();
 			if (bookmarkId.compareTo(minId) < 0) {
 				minId = bookmarkId;
 			}
 
-			Post p = tuple.get(post);
+			Post p = tuple.getEntity();
 			MainPageResponse.PostDTO post = toMainPageResponse_Post(p, true);
 			posts.add(post);
 		}
