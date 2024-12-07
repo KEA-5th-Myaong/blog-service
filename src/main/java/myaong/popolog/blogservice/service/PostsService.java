@@ -89,15 +89,43 @@ public class PostsService {
 	}
 
 	@Transactional(readOnly = true)
-	public PostDetailResponse getPostById(Long postId) {
+	public PostDetailResponse getPostDetails(Long postId, Long memberId) {
 		Post post = postRepository.findById(postId)
 				.orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
-
-		List<Comment> comments = commentRepository.findByPostId(postId);
-
-		boolean isBookmarked = bookmarkRepository.existsByPostAndProfile(post, new Profile(1L, "", "", "", "", ""));
-
-		return PostDetailResponse.of(post, comments, isBookmarked);
+		// 댓글 조회
+		List<Comment> comments = commentRepository.findByPost(post);
+		// 좋아요 여부 확인
+		boolean isLiked = (memberId != null) && likeRepository.existsByPostAndMemberId(post, memberId);
+		// 북마크 여부 확인
+		boolean isBookmarked = (memberId != null) && bookmarkRepository.existsByPostAndMemberId(post, memberId);
+		// 댓글 응답 생성
+		List<PostDetailResponse.Comment> commentResponses = comments.stream()
+				.map(c -> PostDetailResponse.Comment.builder()
+						.profilePicUrl(c.getProfile() != null ? c.getProfile().getProfilePicUrl() : null)
+						.memberId(c.getProfile() != null ? c.getProfile().getId() : null)
+						.nickname(c.getProfile() != null ? c.getProfile().getNickname() : null)
+						.commentId(c.getId())
+						.parentCommentId(c.getParentComment() != null ? c.getParentComment().getId() : null)
+						.comment(c.getContent())
+						.timestamp(c.getCreatedAt())
+						.build())
+				.toList();
+		// 응답 객체 생성
+		return PostDetailResponse.builder()
+				.postId(post.getId())
+				.title(post.getTitle())
+				.content(post.getContent())
+				.timestamp(post.getCreatedAt())
+				.memberId(post.getProfile() != null ? post.getProfile().getId() : null)
+				.username(post.getProfile() != null ? post.getProfile().getUsername() : null)
+				.nickname(post.getProfile() != null ? post.getProfile().getNickname() : null)
+				.profilePicUrl(post.getProfile() != null ? post.getProfile().getProfilePicUrl() : null)
+				.likeCount(post.getLikes().size())
+				.isLiked(isLiked)
+				.isBookmarked(isBookmarked)
+				.commentCount(comments.size())
+				.comments(commentResponses)
+				.build();
 	}
 
 	// 좋아요 토글
