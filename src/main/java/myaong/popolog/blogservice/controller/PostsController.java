@@ -31,9 +31,20 @@ public class PostsController {
 	@GetMapping("/{postId}")
 	public ResponseEntity<ApiResponse<PostDetailResponse>> getPostDetails(
 			@PathVariable Long postId,
-			@RequestHeader(value = "memberId", required = false) Long memberId) {
+			@RequestHeader(value = "memberId") Long memberId) {
 		PostDetailResponse res = postsService.getPostDetails(postId, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 34", description = "URL로 포스트 조회")
+	@GetMapping("/{username}/{title}")
+	public ResponseEntity<ApiResponse<PostDetailResponse>> getPostByUrl(
+			@PathVariable String username,
+			@PathVariable String title,
+			@RequestHeader(value = "memberId") Long memberId) {
+
+		PostDetailResponse response = postsService.getPostByUrl(username, title, memberId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(response));
 	}
 
 	@Operation(summary = "API 명세서 v0.3 line 46", description = "좋아요 토글")
