@@ -1,9 +1,12 @@
 package myaong.popolog.blogservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
+import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.response.LikeResponse;
+import myaong.popolog.blogservice.dto.response.PostCreateResponse;
 import myaong.popolog.blogservice.dto.response.PostDetailResponse;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.service.PostsService;
@@ -43,7 +46,16 @@ public class PostsController {
 			@PathVariable String title,
 			@RequestHeader(value = "memberId") Long memberId) {
 
-		PostDetailResponse response = postsService.getPostByUrl(username, title, memberId);
+		PostDetailResponse res = postsService.getPostByUrl(username, title, memberId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(res));
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 35", description = "포스트 작성")
+	@PostMapping
+	public ResponseEntity<ApiResponse<PostCreateResponse>> createPost(
+			@RequestBody @Valid PostCreateRequest request,
+			@RequestHeader("memberId") Long memberId) {
+		PostCreateResponse response = postsService.createPost(memberId, request);
 		return ResponseEntity.ok(ApiResponse.onSuccess(response));
 	}
 

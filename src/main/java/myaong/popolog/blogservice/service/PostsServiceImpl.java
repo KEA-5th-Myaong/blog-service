@@ -1,11 +1,14 @@
 package myaong.popolog.blogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.response.LikeResponse;
+import myaong.popolog.blogservice.dto.response.PostCreateResponse;
 import myaong.popolog.blogservice.dto.response.PostDetailResponse;
 import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Like;
 import myaong.popolog.blogservice.entity.Post;
+import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.feign.constant.NotificationType;
 import myaong.popolog.blogservice.feign.service.NotificationFeignService;
 import myaong.popolog.blogservice.repository.BookmarkRepository;
@@ -114,6 +117,26 @@ public class PostsServiceImpl implements PostsService {
         return PostsResponse.builder()
                 .lastId(minId)
                 .posts(posts)
+                .build();
+    }
+
+    @Override
+    public PostCreateResponse createPost(Long memberId, PostCreateRequest request) {
+        // 작성자 프로필 검증
+        Profile profile = profileRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+
+        // 게시물 저장
+        Post post = postRepository.save(Post.builder()
+                .profile(profile)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .isBlinded(false)
+                .build());
+
+        // 응답 반환
+        return PostCreateResponse.builder()
+                .postId(post.getId())
                 .build();
     }
 
