@@ -70,6 +70,15 @@ public class PostsController {
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 
+	@Operation(summary = "API 명세서 v0.4 line 39", description = "포스트 삭제")
+	@DeleteMapping("/{postId}")
+	public ResponseEntity<ApiResponse<Void>> deletePost(
+			@PathVariable Long postId,
+			@RequestHeader("memberId") Long memberId) {
+		postsService.deletePost(postId, memberId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+	}
+
 	@Operation(summary = "API 명세서 v0.3 line 46", description = "좋아요 토글")
 	@PutMapping("/{postId}/like")
 	public ResponseEntity<ApiResponse<LikeResponse>> toggleLike(

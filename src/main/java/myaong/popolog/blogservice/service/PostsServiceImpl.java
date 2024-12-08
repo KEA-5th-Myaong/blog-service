@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static io.micrometer.common.util.StringUtils.isBlank;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -147,7 +149,12 @@ public class PostsServiceImpl implements PostsService {
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
         if (!post.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
+            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
+        }
+
+        // 제목 및 내용 공백 여부 확인
+        if (isBlank(request.getTitle()) || isBlank(request.getContent())) {
+            throw new ApiException(ApiCode.INVALID_DATA);
         }
 
         if (request.getTitle() != null) post.updateTitle(request.getTitle());
@@ -156,6 +163,20 @@ public class PostsServiceImpl implements PostsService {
         postRepository.save(post);
     }
 
+    @Override
+    public void deletePost(Long postId, Long memberId) {
+        // 게시물 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+        // 작성자 확인
+        if (!post.getProfile().getId().equals(memberId)) {
+            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
+        }
+
+        // 게시물 삭제
+        postRepository.delete(post);
+    }
 
     @Override
     public LikeResponse toggleLike(Long postId, Long memberId) {

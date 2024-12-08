@@ -15,5 +15,7 @@ public interface PostsService {
 	LikeResponse toggleLike(Long postId, Long memberId);
 	PostCreateResponse createPost(Long memberId, PostCreateRequest request);
 	void updatePost(Long postId, Long memberId, PostUpdateRequest request);
+	void deletePost(Long postId, Long memberId);
+
 }
 
