@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
+import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
 import myaong.popolog.blogservice.dto.response.LikeResponse;
 import myaong.popolog.blogservice.dto.response.PostCreateResponse;
 import myaong.popolog.blogservice.dto.response.PostDetailResponse;
@@ -57,6 +58,16 @@ public class PostsController {
 			@RequestHeader("memberId") Long memberId) {
 		PostCreateResponse response = postsService.createPost(memberId, request);
 		return ResponseEntity.ok(ApiResponse.onSuccess(response));
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 38", description = "포스트 수정")
+	@PutMapping("/{postId}")
+	public ResponseEntity<ApiResponse<Void>> updatePost(
+			@PathVariable Long postId,
+			@RequestBody PostUpdateRequest request,
+			@RequestHeader("memberId") Long memberId) {
+		postsService.updatePost(postId, memberId, request);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 
 	@Operation(summary = "API 명세서 v0.3 line 46", description = "좋아요 토글")

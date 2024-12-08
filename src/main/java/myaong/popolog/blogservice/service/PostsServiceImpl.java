@@ -2,6 +2,7 @@ package myaong.popolog.blogservice.service;
 
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
+import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
 import myaong.popolog.blogservice.dto.response.LikeResponse;
 import myaong.popolog.blogservice.dto.response.PostCreateResponse;
 import myaong.popolog.blogservice.dto.response.PostDetailResponse;
@@ -139,6 +140,22 @@ public class PostsServiceImpl implements PostsService {
                 .postId(post.getId())
                 .build();
     }
+
+    @Override
+    public void updatePost(Long postId, Long memberId, PostUpdateRequest request) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+        if (!post.getProfile().getId().equals(memberId)) {
+            throw new ApiException(ApiCode.METHOD_NOT_ALLOWED);
+        }
+
+        if (request.getTitle() != null) post.updateTitle(request.getTitle());
+        if (request.getContent() != null) post.updateContent(request.getContent());
+
+        postRepository.save(post);
+    }
+
 
     @Override
     public LikeResponse toggleLike(Long postId, Long memberId) {
