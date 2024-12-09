@@ -1,12 +1,10 @@
 package myaong.popolog.blogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.common.Prefix;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
-import myaong.popolog.blogservice.dto.response.LikeResponse;
-import myaong.popolog.blogservice.dto.response.PostCreateResponse;
-import myaong.popolog.blogservice.dto.response.PostDetailResponse;
-import myaong.popolog.blogservice.dto.response.PostsResponse;
+import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.entity.Like;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
@@ -20,6 +18,7 @@ import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +36,7 @@ public class PostsServiceImpl implements PostsService {
     private final BookmarkRepository bookmarkRepository;
     private final NotificationFeignService notificationFeignService;
     private final ProfileRepository profileRepository;
+    private final S3ApiService s3ApiService;
 
     @Override
     public PostDetailResponse getPostDetails(Long postId, Long memberId) {
@@ -129,6 +129,12 @@ public class PostsServiceImpl implements PostsService {
         Profile profile = profileRepository.findById(memberId)
                 .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
 
+        // 이미지 URL 이동 처리 (임시 저장소 -> 영구 저장소)
+        if (request.getPicUrl() != null && !request.getPicUrl().isEmpty()) {
+            String persistentPicUrl = s3ApiService.moveToPersistentStorage(request.getPicUrl());
+            request.setPicUrl(persistentPicUrl); // URL 업데이트
+        }
+
         // 게시물 저장
         Post post = postRepository.save(Post.builder()
                 .profile(profile)
@@ -177,6 +183,17 @@ public class PostsServiceImpl implements PostsService {
         // 게시물 삭제
         postRepository.delete(post);
     }
+
+    @Override
+    public PostPicResponse uploadPostImage(Long memberId, MultipartFile image) {
+        // 이미지 업로드 처리 (S3 업로드)
+        String imageUrl = s3ApiService.uploadToTempStorage(Prefix.POST, image);
+        // 응답 객체 생성 및 반환
+        return PostPicResponse.builder()
+                .picUrl(imageUrl)
+                .build();
+    }
+
 
     @Override
     public LikeResponse toggleLike(Long postId, Long memberId) {

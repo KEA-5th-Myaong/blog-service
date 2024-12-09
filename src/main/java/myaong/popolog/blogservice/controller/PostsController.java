@@ -6,13 +6,13 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
-import myaong.popolog.blogservice.dto.response.LikeResponse;
-import myaong.popolog.blogservice.dto.response.PostCreateResponse;
-import myaong.popolog.blogservice.dto.response.PostDetailResponse;
-import myaong.popolog.blogservice.dto.response.PostsResponse;
+import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.service.PostsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/blog/posts")
@@ -57,6 +57,15 @@ public class PostsController {
 			@RequestBody @Valid PostCreateRequest request,
 			@RequestHeader("memberId") Long memberId) {
 		PostCreateResponse response = postsService.createPost(memberId, request);
+		return ResponseEntity.ok(ApiResponse.onSuccess(response));
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 36", description = "포스트 이미지 등록")
+	@PostMapping("/pic")
+	public ResponseEntity<ApiResponse<PostPicResponse>> uploadPostImage(
+			@RequestHeader("memberId") Long memberId,
+			@RequestParam MultipartFile pic) {
+		PostPicResponse response = postsService.uploadPostImage(memberId, pic);
 		return ResponseEntity.ok(ApiResponse.onSuccess(response));
 	}
 

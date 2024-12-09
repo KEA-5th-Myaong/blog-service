@@ -1,11 +1,9 @@
 package myaong.popolog.blogservice.service;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
-import myaong.popolog.blogservice.dto.response.LikeResponse;
-import myaong.popolog.blogservice.dto.response.PostCreateResponse;
-import myaong.popolog.blogservice.dto.response.PostDetailResponse;
-import myaong.popolog.blogservice.dto.response.PostsResponse;
+import myaong.popolog.blogservice.dto.response.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public interface PostsService {
@@ -16,6 +14,7 @@ public interface PostsService {
 	PostCreateResponse createPost(Long memberId, PostCreateRequest request);
 	void updatePost(Long postId, Long memberId, PostUpdateRequest request);
 	void deletePost(Long postId, Long memberId);
+	PostPicResponse uploadPostImage(Long memberId, MultipartFile image);
 
 }
 
