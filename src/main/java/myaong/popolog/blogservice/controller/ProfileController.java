@@ -58,7 +58,7 @@ public class ProfileController {
 	@Operation(summary = "API 명세서 v0.4 line 53", description = "프로필 사진 수정")
 	@PostMapping("/pic")
 	public ApiResponse<ProfilePicUrlResponse> updateProfilePic(@RequestHeader("memberId") Long memberId,
-															   @RequestParam(value = "pic", required = false) MultipartFile pic) {
+															   @RequestParam(value = "profilePic", required = false) MultipartFile pic) {
 
 		if (pic == null || pic.isEmpty()) {
 			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId));
