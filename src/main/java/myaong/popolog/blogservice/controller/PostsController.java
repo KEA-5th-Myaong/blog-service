@@ -102,7 +102,7 @@ public class PostsController {
 	public ResponseEntity<ApiResponse<PostBookmarkResponse>> toggleBookmark(
 			@RequestHeader("memberId") Long memberId,
 			@PathVariable Long postId) {
-		PostBookmarkResponse response = postsService.toggleBookmark(memberId, postId);
+		PostBookmarkResponse response = postsService.toggleBookmark(postId, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(response));
 	}
 

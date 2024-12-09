@@ -2,10 +2,8 @@ package myaong.popolog.blogservice.service;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
 import myaong.popolog.blogservice.dto.response.*;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
 public interface PostsService {
 	PostDetailResponse getPostDetails(Long postId, Long memberId);
 	PostDetailResponse getPostByUrl(String username, String title, Long memberId);

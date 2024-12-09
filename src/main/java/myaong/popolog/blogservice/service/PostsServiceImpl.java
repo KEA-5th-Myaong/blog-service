@@ -200,6 +200,7 @@ public class PostsServiceImpl implements PostsService {
     }
 
 
+    @Transactional
     @Override
     public LikeResponse toggleLike(Long postId, Long memberId) {
         // 게시물 조회
@@ -262,6 +263,7 @@ public class PostsServiceImpl implements PostsService {
         return content.length() > 400 ? content.substring(0, 400) : content;
     }
 
+    @Transactional
     @Override
     public PostBookmarkResponse toggleBookmark(Long postId, Long memberId) {
         // 게시물 조회
