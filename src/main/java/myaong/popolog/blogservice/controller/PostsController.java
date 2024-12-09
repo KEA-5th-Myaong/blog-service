@@ -98,7 +98,7 @@ public class PostsController {
 	}
 
 	@Operation(summary = "API 명세서 v0.3 line 47", description = "북마크 토글")
-	@PostMapping("/{postId}/bookmark")
+	@PutMapping("/{postId}/bookmark")
 	public ResponseEntity<ApiResponse<PostBookmarkResponse>> toggleBookmark(
 			@RequestHeader("memberId") Long memberId,
 			@PathVariable Long postId) {
