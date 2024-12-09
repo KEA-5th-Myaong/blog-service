@@ -105,4 +105,14 @@ public class PostsController {
 		PostBookmarkResponse response = postsService.toggleBookmark(memberId, postId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(response));
 	}
+
+	@Operation(summary = "API 명세서 v0.4 line 48", description = "콘텐츠 신고")
+	@PutMapping("/{postId}/report")
+	public ResponseEntity<ApiResponse<Void>> reportPost(
+			@PathVariable Long postId,
+			@RequestHeader("memberId") Long memberId) {
+		postsService.reportPost(postId, memberId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
+	}
+
 }

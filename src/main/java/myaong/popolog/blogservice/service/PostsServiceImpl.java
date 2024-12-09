@@ -5,18 +5,13 @@ import myaong.popolog.blogservice.common.Prefix;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
 import myaong.popolog.blogservice.dto.response.*;
-import myaong.popolog.blogservice.entity.Bookmark;
-import myaong.popolog.blogservice.entity.Like;
-import myaong.popolog.blogservice.entity.Post;
-import myaong.popolog.blogservice.entity.Profile;
+import myaong.popolog.blogservice.entity.*;
+import myaong.popolog.blogservice.enums.ContentsType;
 import myaong.popolog.blogservice.feign.constant.NotificationType;
 import myaong.popolog.blogservice.feign.service.NotificationFeignService;
-import myaong.popolog.blogservice.repository.BookmarkRepository;
-import myaong.popolog.blogservice.repository.LikeRepository;
-import myaong.popolog.blogservice.repository.PostRepository;
+import myaong.popolog.blogservice.repository.*;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
-import myaong.popolog.blogservice.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +33,7 @@ public class PostsServiceImpl implements PostsService {
     private final NotificationFeignService notificationFeignService;
     private final ProfileRepository profileRepository;
     private final S3ApiService s3ApiService;
+    private final ReportRepository reportRepository;
 
     @Override
     public PostDetailResponse getPostDetails(Long postId, Long memberId) {
@@ -298,6 +294,31 @@ public class PostsServiceImpl implements PostsService {
         return PostBookmarkResponse.builder()
                 .bookmark(isBookmarked)
                 .build();
+    }
+
+    @Override
+    public void reportPost(Long postId, Long memberId) {
+        // 게시물 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+        // 이미 신고한 콘텐츠인지 확인
+        boolean isAlreadyReported = reportRepository.existsByProfileIdAndContentsIdAndContentsType(
+                memberId, postId, ContentsType.POST);
+        if (isAlreadyReported) {
+            throw new ApiException(ApiCode.REPORT_DUPLICATED);
+        }
+
+        // 신고 데이터 저장
+        Profile profile = profileRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+
+        Report report = Report.builder()
+                .profile(profile)
+                .contentsId(postId)
+                .contentsType(ContentsType.POST)
+                .build();
+        reportRepository.save(report);
     }
 
 }
