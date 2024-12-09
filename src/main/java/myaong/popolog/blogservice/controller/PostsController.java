@@ -45,7 +45,7 @@ public class PostsController {
 	public ResponseEntity<ApiResponse<PostDetailResponse>> getPostByUrl(
 			@PathVariable String username,
 			@PathVariable String title,
-			@RequestHeader(value = "memberId") Long memberId) {
+			@RequestHeader(value = "memberId", required = false) Long memberId) {
 
 		PostDetailResponse res = postsService.getPostByUrl(username, title, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
