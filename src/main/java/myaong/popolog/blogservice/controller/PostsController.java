@@ -96,4 +96,13 @@ public class PostsController {
 		LikeResponse response = postsService.toggleLike(postId, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(response));
 	}
+
+	@Operation(summary = "API 명세서 v0.3 line 47", description = "북마크 토글")
+	@PostMapping("/{postId}/bookmark")
+	public ResponseEntity<ApiResponse<PostBookmarkResponse>> toggleBookmark(
+			@RequestHeader("memberId") Long memberId,
+			@PathVariable Long postId) {
+		PostBookmarkResponse response = postsService.toggleBookmark(memberId, postId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(response));
+	}
 }

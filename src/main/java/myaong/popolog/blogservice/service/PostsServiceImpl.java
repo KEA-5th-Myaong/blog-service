@@ -5,6 +5,7 @@ import myaong.popolog.blogservice.common.Prefix;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
 import myaong.popolog.blogservice.dto.response.*;
+import myaong.popolog.blogservice.entity.Bookmark;
 import myaong.popolog.blogservice.entity.Like;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
@@ -89,10 +90,14 @@ public class PostsServiceImpl implements PostsService {
     public PostsResponse getPostsOf(Long memberId, Long lastId) {
         // lastId 검증
         validateLastId(lastId);
+
         // 회원 프로필 검증
-        validateProfileExists(memberId);
-        // 게시물 조회
-        List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
+        Profile profile = profileRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+
+        // 게시물 조회 (자신의 게시물만)
+        List<Post> postList = postRepository.findTop10ByProfile_IdAndIdLessThanOrderByIdDesc(memberId, lastId);
+
         // 응답 데이터 준비
         List<PostsResponse.Posts> posts = new ArrayList<>();
         long minId = Long.MAX_VALUE;
@@ -101,7 +106,9 @@ public class PostsServiceImpl implements PostsService {
             if (postId.compareTo(minId) < 0) {
                 minId = postId;
             }
+
             boolean isBookmarked = bookmarkRepository.existsByPostAndMemberId(p, memberId);
+
             PostsResponse.Posts post = PostsResponse.Posts.builder()
                     .postId(postId)
                     .title(p.getTitle())
@@ -110,6 +117,7 @@ public class PostsServiceImpl implements PostsService {
                     .likeCount(p.getLikes().size())
                     .isBookmarked(isBookmarked)
                     .build();
+
             posts.add(post);
         }
 
@@ -117,6 +125,7 @@ public class PostsServiceImpl implements PostsService {
         if (postList.size() < 10) {
             minId = -1L;
         }
+
         return PostsResponse.builder()
                 .lastId(minId)
                 .posts(posts)
@@ -256,4 +265,39 @@ public class PostsServiceImpl implements PostsService {
     private String truncateContent(String content) {
         return content.length() > 400 ? content.substring(0, 400) : content;
     }
+
+    @Override
+    public PostBookmarkResponse toggleBookmark(Long postId, Long memberId) {
+        // 게시물 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+        // 회원 프로필 조회
+        Profile profile = profileRepository.findById(memberId)
+                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+
+        // 북마크 여부 확인
+        Optional<Bookmark> existingBookmark = bookmarkRepository.findByPostAndProfile(post, profile);
+
+        boolean isBookmarked;
+
+        if (existingBookmark.isPresent()) {
+            // 이미 북마크가 존재하면 삭제
+            bookmarkRepository.delete(existingBookmark.get());
+            isBookmarked = false;
+        } else {
+            // 북마크가 없으면 생성
+            Bookmark bookmark = Bookmark.builder()
+                    .profile(profile)
+                    .post(post)
+                    .build();
+            bookmarkRepository.save(bookmark);
+            isBookmarked = true;
+        }
+
+        return PostBookmarkResponse.builder()
+                .bookmark(isBookmarked)
+                .build();
+    }
+
 }

@@ -15,6 +15,6 @@ public interface PostsService {
 	void updatePost(Long postId, Long memberId, PostUpdateRequest request);
 	void deletePost(Long postId, Long memberId);
 	PostPicResponse uploadPostImage(Long memberId, MultipartFile image);
-
+	PostBookmarkResponse toggleBookmark(Long memberId, Long postId);
 }
 
