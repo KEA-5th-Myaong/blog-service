@@ -15,7 +15,6 @@ import myaong.popolog.blogservice.common.exception.ApiException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,7 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class PostsServiceImpl implements PostsService {
 
     private final PostRepository postRepository;
@@ -201,7 +200,6 @@ public class PostsServiceImpl implements PostsService {
     }
 
 
-    @Transactional
     @Override
     public LikeResponse toggleLike(Long postId, Long memberId) {
         // 게시물 조회
@@ -264,7 +262,6 @@ public class PostsServiceImpl implements PostsService {
         return content.length() > 400 ? content.substring(0, 400) : content;
     }
 
-    @Transactional
     @Override
     public PostBookmarkResponse toggleBookmark(Long postId, Long memberId) {
         // 게시물 조회
