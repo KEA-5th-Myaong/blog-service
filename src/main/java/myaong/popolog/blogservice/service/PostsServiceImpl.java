@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.Prefix;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
+import myaong.popolog.blogservice.dto.request.ReportRequest;
 import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.entity.*;
 import myaong.popolog.blogservice.enums.ContentsType;
@@ -33,6 +34,7 @@ public class PostsServiceImpl implements PostsService {
     private final ProfileRepository profileRepository;
     private final S3ApiService s3ApiService;
     private final ReportRepository reportRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public PostDetailResponse getPostDetails(Long postId, Long memberId) {
@@ -296,29 +298,38 @@ public class PostsServiceImpl implements PostsService {
                 .build();
     }
 
-    @Override
-    public void reportPost(Long postId, Long memberId) {
-        // 게시물 조회
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+    @Transactional
+    public void reportPost(Long postId, Long memberId, ReportRequest request) {
+        // 콘텐츠 존재 여부 확인
+        ContentsType contentsType = request.getContentType();
 
-        // 이미 신고한 콘텐츠인지 확인
+        if (contentsType == ContentsType.POST) {
+            postRepository.findById(request.getContentId())
+                    .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+        } else if (contentsType == ContentsType.COMMENT) {
+            commentRepository.findById(request.getContentId())
+                    .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
+        }
+
+        // 중복 신고 여부 확인
         boolean isAlreadyReported = reportRepository.existsByProfileIdAndContentsIdAndContentsType(
-                memberId, postId, ContentsType.POST);
+                memberId, request.getContentId(), contentsType);
+
         if (isAlreadyReported) {
             throw new ApiException(ApiCode.REPORT_DUPLICATED);
         }
 
-        // 신고 데이터 저장
+        // 신고한 회원 정보 확인
         Profile profile = profileRepository.findById(memberId)
                 .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
 
+        // 신고 데이터 생성 및 저장
         Report report = Report.builder()
                 .profile(profile)
-                .contentsId(postId)
-                .contentsType(ContentsType.POST)
+                .contentsId(request.getContentId())
+                .contentsType(contentsType)
                 .build();
+
         reportRepository.save(report);
     }
-
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
+import myaong.popolog.blogservice.dto.request.ReportRequest;
 import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.service.PostsService;
 import org.springframework.http.ResponseEntity;
@@ -108,12 +109,12 @@ public class PostsController {
 	}
 
 	@Operation(summary = "API 명세서 v0.4 line 48", description = "콘텐츠 신고")
-	@PutMapping("/{postId}/report")
+	@PostMapping("/{postId}/report")
 	public ResponseEntity<ApiResponse<Void>> reportPost(
 			@PathVariable Long postId,
-			@RequestHeader("memberId") Long memberId) {
-		postsService.reportPost(postId, memberId);
+			@RequestHeader("memberId") Long memberId,
+			@RequestBody ReportRequest reportRequest) {
+		postsService.reportPost(postId, memberId, reportRequest);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
-
 }
