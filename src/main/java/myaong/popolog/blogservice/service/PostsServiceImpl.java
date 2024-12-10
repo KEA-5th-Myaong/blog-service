@@ -83,7 +83,7 @@ public class PostsServiceImpl implements PostsService {
     }
 
     @Override
-    public PostsResponse getPostsOf(Long memberId, Long lastId) {
+    public PostsResponse getPostsOf(Long requesterId, Long memberId, Long lastId) {
         // lastId 검증
         validateLastId(lastId);
 
@@ -92,7 +92,7 @@ public class PostsServiceImpl implements PostsService {
                 .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
 
         // 게시물 조회 (자신의 게시물만)
-        List<Post> postList = postRepository.findTop10ByProfile_IdAndIdLessThanOrderByIdDesc(memberId, lastId);
+        List<Post> postList = postRepository.findTop10ByProfileAndIdLessThanOrderByIdDesc(profile, lastId);
 
         // 응답 데이터 준비
         List<PostsResponse.Posts> posts = new ArrayList<>();
@@ -103,7 +103,7 @@ public class PostsServiceImpl implements PostsService {
                 minId = postId;
             }
 
-            boolean isBookmarked = bookmarkRepository.existsByPostAndMemberId(p, memberId);
+            boolean isBookmarked = requesterId != null && bookmarkRepository.existsByPostAndMemberId(p, requesterId);
 
             PostsResponse.Posts post = PostsResponse.Posts.builder()
                     .postId(postId)

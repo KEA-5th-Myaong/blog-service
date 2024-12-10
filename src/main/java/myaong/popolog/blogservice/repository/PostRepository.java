@@ -1,6 +1,7 @@
 package myaong.popolog.blogservice.repository;
 
 import myaong.popolog.blogservice.entity.Post;
+import myaong.popolog.blogservice.entity.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +17,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, QPostReposito
 	List<Post> findTop10ByIdLessThanOrderByIdDesc(Long lastId);
 	@Query("SELECT p FROM Post p JOIN p.profile pr WHERE pr.username = :username AND p.title = :title")
 	Optional<Post> findByUsernameAndTitle(@Param("username") String username, @Param("title") String title);
-	List<Post> findTop10ByProfile_IdAndIdLessThanOrderByIdDesc(Long profileId, Long lastId);
+	List<Post> findTop10ByProfileAndIdLessThanOrderByIdDesc(Profile profile, Long lastId);
 }

@@ -24,10 +24,11 @@ public class PostsController {
 	@Operation(summary = "API 명세서 v0.4 line 32", description = "블로그 포스트 목록 조회")
 	@GetMapping("/members/{memberId}/{lastId}")
 	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(
+			@RequestHeader(value = "memberId", required = false) Long requesterId,
 			@PathVariable Long memberId,
 			@PathVariable Long lastId
 	) {
-		PostsResponse res = postsService.getPostsOf(memberId, lastId);
+		PostsResponse res = postsService.getPostsOf(requesterId, memberId, lastId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
@@ -35,7 +36,7 @@ public class PostsController {
 	@GetMapping("/{postId}")
 	public ResponseEntity<ApiResponse<PostDetailResponse>> getPostDetails(
 			@PathVariable Long postId,
-			@RequestHeader(value = "memberId") Long memberId) {
+			@RequestHeader(value = "memberId", required = false) Long memberId) {
 		PostDetailResponse res = postsService.getPostDetails(postId, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}

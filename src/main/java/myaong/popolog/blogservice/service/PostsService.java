@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface PostsService {
 	PostDetailResponse getPostDetails(Long postId, Long memberId);
 	PostDetailResponse getPostByUrl(String username, String title, Long memberId);
-	PostsResponse getPostsOf(Long memberId, Long lastId);
+	PostsResponse getPostsOf(Long requesterId, Long memberId, Long lastId);
 	LikeResponse toggleLike(Long postId, Long memberId);
 	PostCreateResponse createPost(Long memberId, PostCreateRequest request);
 	void updatePost(Long postId, Long memberId, PostUpdateRequest request);
