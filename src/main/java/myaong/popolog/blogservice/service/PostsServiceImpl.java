@@ -91,8 +91,15 @@ public class PostsServiceImpl implements PostsService {
         Profile profile = profileRepository.findById(memberId)
                 .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
 
-        // 게시물 조회 (자신의 게시물만)
-        List<Post> postList = postRepository.findTop10ByProfileAndIdLessThanOrderByIdDesc(profile, lastId);
+        // 게시물 조회
+        List<Post> postList;
+        if (lastId == 0) {
+            // lastId가 0일 경우, 최근 게시물부터 조회
+            postList = postRepository.findTop10ByProfileOrderByIdDesc(profile);
+        } else {
+            // lastId가 0이 아닐 경우, 해당 ID보다 작은 게시물 조회
+            postList = postRepository.findTop10ByProfileAndIdLessThanOrderByIdDesc(profile, lastId);
+        }
 
         // 응답 데이터 준비
         List<PostsResponse.Posts> posts = new ArrayList<>();
@@ -133,12 +140,6 @@ public class PostsServiceImpl implements PostsService {
         // 작성자 프로필 검증
         Profile profile = profileRepository.findById(memberId)
                 .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
-
-        // 이미지 URL 이동 처리 (임시 저장소 -> 영구 저장소)
-        if (request.getPicUrl() != null && !request.getPicUrl().isEmpty()) {
-            String persistentPicUrl = s3ApiService.moveToPersistentStorage(request.getPicUrl());
-            request.setPicUrl(persistentPicUrl); // URL 업데이트
-        }
 
         // 게시물 저장
         Post post = postRepository.save(Post.builder()

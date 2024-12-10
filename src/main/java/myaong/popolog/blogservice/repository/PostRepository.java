@@ -18,4 +18,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, QPostReposito
 	@Query("SELECT p FROM Post p JOIN p.profile pr WHERE pr.username = :username AND p.title = :title")
 	Optional<Post> findByUsernameAndTitle(@Param("username") String username, @Param("title") String title);
 	List<Post> findTop10ByProfileAndIdLessThanOrderByIdDesc(Profile profile, Long lastId);
+	List<Post> findTop10ByProfileOrderByIdDesc(Profile profile);
 }
