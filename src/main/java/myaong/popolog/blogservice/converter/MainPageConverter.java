@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.dto.response.MainPageResponse;
 import myaong.popolog.blogservice.entity.Post;
+import myaong.popolog.blogservice.entity.Prejob;
 import myaong.popolog.blogservice.entity.Profile;
+import myaong.popolog.blogservice.repository.LikeRepository;
 import myaong.popolog.blogservice.service.BookmarkService;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,7 @@ import java.util.List;
 public class MainPageConverter {
 
 	private final BookmarkService bookmarkService;
+	private final LikeRepository likeRepository;
 
 	public MainPageResponse toMainPageResponse(List<Post> postList) {
 
@@ -102,6 +105,8 @@ public class MainPageConverter {
 				.username(post.getProfile().getUsername())
 				.nickname(post.getProfile().getNickname())
 				.profilePicUrl(post.getProfile().getProfilePicUrl())
+				.prejob(post.getProfile().getPrejobs().stream().map(Prejob::getJobName).toList())
+				.likeCount(likeRepository.countByPost(post))
 				.isBookmarked(isBookmarked)
 				.build();
 	}
