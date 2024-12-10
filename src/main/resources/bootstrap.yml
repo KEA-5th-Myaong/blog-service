@@ -1,7 +1,7 @@
 spring:
   cloud:
     config:
-      uri: http://172.16.210.30:8888 #config 서버
+      uri: ${CONFIG_URL:http://172.16.210.30:8888} #config 서버
       name: blog-service #서비스 이름
   profiles:
-    active: local #활성화할 profile(local,dev,prod,onprem 중,,,)
+    active: prod #활성화할 profile(local,dev,prod,onprem 중,,,)
