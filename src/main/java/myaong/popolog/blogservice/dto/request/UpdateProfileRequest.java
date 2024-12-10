@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 public class UpdateProfileRequest {
 
-	@NotBlank(message = "이름을 작성해주세요.")
-	private String name;
+	@NotBlank(message = "닉네임을 작성해주세요.")
+	private String nickname;
 	@NotBlank(message = "블로그 소개글을 작성해주세요.")
 	private String blogIntro;
 }

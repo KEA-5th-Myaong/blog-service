@@ -76,7 +76,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	public void updateProfile(Long memberId, UpdateProfileRequest req) {
 
 		Profile profile = profileQueryService.findById(memberId);
-		profile.updateNameAndBlogIntro(req.getName(), req.getBlogIntro());
+		profile.updateNameAndBlogIntro(req.getNickname(), req.getBlogIntro());
 	}
 
 	@Override
