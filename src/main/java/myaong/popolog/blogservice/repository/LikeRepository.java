@@ -12,5 +12,5 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByPostIdAndMemberId(Long postId, Long memberId);
     boolean existsByPostAndMemberId(Post post, Long memberId);
     // 게시물의 좋아요 수 조회
-    int countByPost(Post post);
+    long countByPost(Post post);
 }
