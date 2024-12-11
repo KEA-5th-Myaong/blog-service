@@ -2,6 +2,7 @@ package myaong.popolog.blogservice.service;
 
 import myaong.popolog.blogservice.dto.response.AdminReportedContentsResponse;
 import myaong.popolog.blogservice.dto.request.BlindToggleRequest;
+import myaong.popolog.blogservice.dto.response.BlindToggleResponse;
 import myaong.popolog.blogservice.dto.response.CommentResponse;
 import myaong.popolog.blogservice.dto.response.PostResponse;
 
@@ -13,7 +14,7 @@ public interface AdminBlogService {
 
     AdminReportedContentsResponse getBlindContents(Long lastId);
 
-    BlindToggleRequest toggleCommentBlind(Long commentId);
+    BlindToggleResponse toggleCommentBlind(Long commentId);
 
-    BlindToggleRequest togglePostBlind(Long postId); // 반환 타입 변경
+    BlindToggleResponse togglePostBlind(Long postId); // 반환 타입 변경
 }

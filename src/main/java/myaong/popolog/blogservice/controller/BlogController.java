@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/blog")
 @RequiredArgsConstructor
-public class 	BlogController {
+public class BlogController {
 
 	private final MainPageService mainPageService;
 

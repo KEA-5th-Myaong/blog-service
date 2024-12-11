@@ -3,11 +3,8 @@ package myaong.popolog.blogservice.service;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
-import myaong.popolog.blogservice.dto.response.AdminReportedContentsResponse;
+import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.dto.request.BlindToggleRequest;
-import myaong.popolog.blogservice.dto.response.CommentResponse;
-import myaong.popolog.blogservice.dto.response.PostResponse;
-import myaong.popolog.blogservice.dto.response.PostsResponse;
 import myaong.popolog.blogservice.entity.Comment;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Report;
@@ -74,7 +71,7 @@ public class AdminBlogServiceImpl implements AdminBlogService {
 
     @Transactional
     @Override
-    public BlindToggleRequest toggleCommentBlind(Long commentId) {
+    public BlindToggleResponse toggleCommentBlind(Long commentId) { // 이름 수정
         // 필요한 데이터만 조회
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
@@ -86,7 +83,7 @@ public class AdminBlogServiceImpl implements AdminBlogService {
         commentRepository.updateBlindedStatus(comment.getId(), comment.getIsBlinded());
 
         // 응답 생성
-        return BlindToggleRequest.builder()
+        return BlindToggleResponse.builder() // 이름 수정
                 .blinded(comment.getIsBlinded())
                 .build();
     }
@@ -94,14 +91,14 @@ public class AdminBlogServiceImpl implements AdminBlogService {
 
     @Transactional
     @Override
-    public BlindToggleRequest togglePostBlind(Long postId) {
+    public BlindToggleResponse togglePostBlind(Long postId) { // 이름 수정
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
         post.toggleBlind();
         postRepository.updateBlindedStatus(post.getId(), post.getIsBlinded());
 
-        return BlindToggleRequest.builder()
+        return BlindToggleResponse.builder() // 이름 수정
                 .blinded(post.getIsBlinded())
                 .build();
     }
