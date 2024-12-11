@@ -1,12 +1,7 @@
 package myaong.popolog.blogservice.service;
 
 import myaong.popolog.blogservice.dto.response.AdminReportedContentsResponse;
-import myaong.popolog.blogservice.dto.request.BlindToggleRequest;
 import myaong.popolog.blogservice.dto.response.BlindToggleResponse;
-import myaong.popolog.blogservice.dto.response.CommentResponse;
-import myaong.popolog.blogservice.dto.response.PostResponse;
-
-import java.util.Map;
 
 public interface AdminBlogService {
 

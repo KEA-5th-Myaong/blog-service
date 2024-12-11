@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.dto.response.*;
-import myaong.popolog.blogservice.dto.request.BlindToggleRequest;
 import myaong.popolog.blogservice.entity.Comment;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Report;
