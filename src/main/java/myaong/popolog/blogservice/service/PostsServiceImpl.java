@@ -27,12 +27,12 @@ import static io.micrometer.common.util.StringUtils.isBlank;
 @Transactional
 public class PostsServiceImpl implements PostsService {
 
+    private final ProfileQueryService profileQueryService;
+    private final S3ApiService s3ApiService;
+    private final NotificationFeignService notificationFeignService;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final NotificationFeignService notificationFeignService;
-    private final ProfileRepository profileRepository;
-    private final S3ApiService s3ApiService;
     private final ReportRepository reportRepository;
     private final CommentRepository commentRepository;
 
@@ -89,8 +89,7 @@ public class PostsServiceImpl implements PostsService {
         validateLastId(lastId);
 
         // 회원 프로필 검증
-        Profile profile = profileRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+        Profile profile = profileQueryService.findById(memberId);
 
         // 게시물 조회
         List<Post> postList;
@@ -139,8 +138,7 @@ public class PostsServiceImpl implements PostsService {
     @Override
     public PostCreateResponse createPost(Long memberId, PostCreateRequest request) {
         // 작성자 프로필 검증
-        Profile profile = profileRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+        Profile profile = profileQueryService.findById(memberId);
 
         // 게시물 저장
         Post post = postRepository.save(Post.builder()
@@ -234,8 +232,7 @@ public class PostsServiceImpl implements PostsService {
 
     private void sendLikeNotification(Post post, Long memberId) {
         // 좋아요를 누른 사용자의 닉네임 가져오기
-        String likerNickname = profileRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND))
+        String likerNickname = profileQueryService.findById(memberId)
                 .getNickname(); // 닉네임 가져오기
 
         // 알림 제목 생성
@@ -253,13 +250,6 @@ public class PostsServiceImpl implements PostsService {
         }
     }
 
-    private void validateProfileExists(Long memberId) {
-        boolean exists = profileRepository.existsById(memberId);
-        if (!exists) {
-            throw new ApiException(ApiCode.MEMBER_NOT_FOUND);
-        }
-    }
-
     private String truncateContent(String content) {
         return content.length() > 400 ? content.substring(0, 400) : content;
     }
@@ -271,8 +261,7 @@ public class PostsServiceImpl implements PostsService {
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
         // 회원 프로필 조회
-        Profile profile = profileRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+        Profile profile = profileQueryService.findById(memberId);
 
         // 북마크 여부 확인
         Optional<Bookmark> existingBookmark = bookmarkRepository.findByPostAndProfile(post, profile);
@@ -298,6 +287,7 @@ public class PostsServiceImpl implements PostsService {
                 .build();
     }
 
+    @Override
     @Transactional
     public void reportPost(Long postId, Long memberId, ReportRequest request) {
         // 콘텐츠 존재 여부 확인
@@ -320,8 +310,7 @@ public class PostsServiceImpl implements PostsService {
         }
 
         // 신고한 회원 정보 확인
-        Profile profile = profileRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+        Profile profile = profileQueryService.findById(memberId);
 
         // 신고 데이터 생성 및 저장
         Report report = Report.builder()
