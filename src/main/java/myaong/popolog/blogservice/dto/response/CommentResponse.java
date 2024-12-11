@@ -17,6 +17,8 @@ public class CommentResponse {
     private Long parentCommentId;
     private String comment;
     private LocalDateTime timestamp;
+    private Boolean blinded;
+
 
     public static CommentResponse of(Comment comment) {
         return CommentResponse.builder()
@@ -27,6 +29,7 @@ public class CommentResponse {
                 .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .comment(comment.getContent())
                 .timestamp(comment.getCreatedAt())
+                .blinded(comment.getIsBlinded())
                 .build();
     }
 }

@@ -19,7 +19,6 @@ public class Post extends BaseEntity {
 	@Column(name = "post_id")
 	private Long id;
 
-	// 작성자 정보
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Profile profile;
@@ -36,13 +35,11 @@ public class Post extends BaseEntity {
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> comments;
 
-	//***** cascade 설정 *****//
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Like> likes;
 
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bookmark> bookmarks;
-	//***** cascade 설정 끝 *****//
 
 	@Builder
 	public Post(Profile profile, String title, String content, Boolean isBlinded) {
@@ -50,5 +47,9 @@ public class Post extends BaseEntity {
 		this.title = title;
 		this.content = content;
 		this.isBlinded = isBlinded;
+	}
+
+	public void toggleBlind() {
+		this.isBlinded = !this.isBlinded;
 	}
 }
