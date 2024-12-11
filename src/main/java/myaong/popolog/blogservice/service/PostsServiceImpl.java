@@ -12,12 +12,17 @@ import myaong.popolog.blogservice.feign.service.NotificationFeignService;
 import myaong.popolog.blogservice.repository.*;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -137,11 +142,13 @@ public class PostsServiceImpl implements PostsService {
         // 작성자 프로필 검증
         Profile profile = profileQueryService.findById(memberId);
 
+        String newContent = processImgUrl(request.getContent(), s3ApiService::moveToPersistentStorage);
+
         // 게시물 저장
         Post post = postRepository.save(Post.builder()
                 .profile(profile)
                 .title(request.getTitle())
-                .content(request.getContent())
+                .content(newContent)
                 .isBlinded(false)
                 .build());
 
@@ -157,17 +164,17 @@ public class PostsServiceImpl implements PostsService {
         Profile profile = profileQueryService.findById(memberId);
         Post post = validatePermissionAndGetPostById(profile, postId);
 
-        if (!post.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
-        }
+        // 기존 포스트의 이미지 이동
+        processImgUrl(post.getContent(), s3ApiService::moveToTempStorage);
 
-        // 제목 및 내용 공백 여부 확인
-        if (isBlank(request.getTitle()) || isBlank(request.getContent())) {
-            throw new ApiException(ApiCode.INVALID_DATA);
-        }
+        // 새 포스트의 이미지 URL도 temp에 있는 것으로 변환
+        String newContent = processImgUrl(request.getContent(), s3ApiService::replacePersistentToTemp);
 
-        if (request.getTitle() != null) post.updateTitle(request.getTitle());
-        if (request.getContent() != null) post.updateContent(request.getContent());
+        // 새 포스트 이미지 변환
+        newContent = processImgUrl(newContent, s3ApiService::moveToPersistentStorage);
+
+        post.updateTitle(request.getTitle());
+        post.updateContent(newContent);
 
         postRepository.save(post);
     }
@@ -192,6 +199,29 @@ public class PostsServiceImpl implements PostsService {
                 .build();
     }
 
+    private Post validatePermissionAndGetPostById(Profile profile, Long postId) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+        if (!post.getProfile().equals(profile)) {
+            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
+        }
+
+        return post;
+    }
+
+    private String processImgUrl(String html, Function<String, String> function) {
+        Document doc = Jsoup.parse(html);
+        Elements imgUrls = doc.select("img");
+
+        // img src 변환
+        for (Element imgUrl : imgUrls) {
+            imgUrl.attr("src", function.apply(imgUrl.attr("src")));
+        }
+
+        return doc.select("body").html();
+    }
 
     @Override
     public LikeResponse toggleLike(Long postId, Long memberId) {
