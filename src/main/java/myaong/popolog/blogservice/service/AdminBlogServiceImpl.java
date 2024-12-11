@@ -59,13 +59,20 @@ public class AdminBlogServiceImpl implements AdminBlogService {
     @Transactional(readOnly = true)
     @Override
     public AdminReportedContentsResponse getBlindContents(Long lastId) {
-        // 블라인드된 게시물만 조회
+        // Step 1: 블라인드된 게시물만 조회
         List<Post> posts = (lastId == 0)
                 ? postRepository.findByIsBlindedTrueOrderByIdDesc()
                 : postRepository.findByIsBlindedTrueAndIdLessThanOrderByIdDesc(lastId);
 
-        // 블라인드 콘텐츠 응답 생성
-        return AdminReportedContentsResponse.fromBlindedContents(posts);
+        // Step 2: 블라인드된 댓글 조회
+        List<Comment> comments = commentRepository.findByIsBlindedTrue();
+
+        // Step 3: 신고 수 계산
+        Map<Long, Integer> reportCounts = reportRepository.countReportsByContents().stream()
+                .collect(Collectors.toMap(o -> (Long) o[0], o -> ((Long) o[1]).intValue()));
+
+        // Step 4: 응답 생성
+        return AdminReportedContentsResponse.fromBlindedContentsWithReports(posts, comments, reportCounts);
     }
 
     @Transactional

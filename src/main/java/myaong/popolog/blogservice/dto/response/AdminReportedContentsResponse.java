@@ -66,19 +66,40 @@ public class AdminReportedContentsResponse {
     }
 
 
-    public static AdminReportedContentsResponse fromBlindedContents(List<Post> posts) {
+    public static AdminReportedContentsResponse fromBlindedContentsWithReports(List<Post> posts, List<Comment> comments, Map<Long, Integer> reportCounts) {
+        List<ReportedContent> contents = posts.stream()
+                .map(post -> ReportedContent.builder()
+                        .postId(post.getId())
+                        .title(post.getTitle())
+                        .contentsType("POST")
+                        .contentsId(post.getId())
+                        .content(post.getContent())
+                        .reportCount(reportCounts.getOrDefault(post.getId(), 0)) // 신고 횟수 포함
+                        .build())
+                .collect(Collectors.toList());
+
+        contents.addAll(comments.stream()
+                .map(comment -> ReportedContent.builder()
+                        .postId(comment.getPost().getId())
+                        .title(comment.getPost().getTitle())
+                        .contentsType("COMMENT")
+                        .contentsId(comment.getId())
+                        .content(comment.getContent())
+                        .reportCount(reportCounts.getOrDefault(comment.getId(), 0)) // 신고 횟수 포함
+                        .build())
+                .collect(Collectors.toList()));
+
         return AdminReportedContentsResponse.builder()
-                .lastId(posts.isEmpty() ? -1L : posts.get(posts.size() - 1).getId())
-                .contents(posts.stream()
-                        .map(post -> ReportedContent.builder()
-                                .postId(post.getId())
-                                .title(post.getTitle())
-                                .contentsType("POST")
-                                .contentsId(post.getId())
-                                .content(post.getContent())
-                                .reportCount(0) // 신고 횟수는 블라인드 콘텐츠에 포함되지 않음
-                                .build())
-                        .collect(Collectors.toList()))
+                .lastId(posts.isEmpty() && comments.isEmpty() ? -1L : calculateLastId(posts, comments))
+                .contents(contents)
                 .build();
     }
+
+    private static Long calculateLastId(List<Post> posts, List<Comment> comments) {
+        Long lastPostId = posts.isEmpty() ? -1L : posts.get(posts.size() - 1).getId();
+        Long lastCommentId = comments.isEmpty() ? -1L : comments.get(comments.size() - 1).getId();
+        return Math.max(lastPostId, lastCommentId);
+    }
+
+
 }
