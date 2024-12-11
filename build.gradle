@@ -66,6 +66,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Jsoup : HTML parsing
+    implementation 'org.jsoup:jsoup:1.18.3'
 }
 
 /**** QueryDSL config start ****/

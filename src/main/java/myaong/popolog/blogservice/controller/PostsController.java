@@ -5,14 +5,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
-import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
+import myaong.popolog.blogservice.dto.request.ReportRequest;
 import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.service.PostsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/blog/posts")
@@ -24,10 +22,11 @@ public class PostsController {
 	@Operation(summary = "API 명세서 v0.4 line 32", description = "블로그 포스트 목록 조회")
 	@GetMapping("/members/{memberId}/{lastId}")
 	public ResponseEntity<ApiResponse<PostsResponse>> getPostsOf(
+			@RequestHeader(value = "memberId", required = false) Long requesterId,
 			@PathVariable Long memberId,
 			@PathVariable Long lastId
 	) {
-		PostsResponse res = postsService.getPostsOf(memberId, lastId);
+		PostsResponse res = postsService.getPostsOf(requesterId, memberId, lastId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
 
@@ -35,7 +34,7 @@ public class PostsController {
 	@GetMapping("/{postId}")
 	public ResponseEntity<ApiResponse<PostDetailResponse>> getPostDetails(
 			@PathVariable Long postId,
-			@RequestHeader(value = "memberId") Long memberId) {
+			@RequestHeader(value = "memberId", required = false) Long memberId) {
 		PostDetailResponse res = postsService.getPostDetails(postId, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}
@@ -45,7 +44,7 @@ public class PostsController {
 	public ResponseEntity<ApiResponse<PostDetailResponse>> getPostByUrl(
 			@PathVariable String username,
 			@PathVariable String title,
-			@RequestHeader(value = "memberId") Long memberId) {
+			@RequestHeader(value = "memberId", required = false) Long memberId) {
 
 		PostDetailResponse res = postsService.getPostByUrl(username, title, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
@@ -73,7 +72,7 @@ public class PostsController {
 	@PutMapping("/{postId}")
 	public ResponseEntity<ApiResponse<Void>> updatePost(
 			@PathVariable Long postId,
-			@RequestBody PostUpdateRequest request,
+			@RequestBody PostCreateRequest request,
 			@RequestHeader("memberId") Long memberId) {
 		postsService.updatePost(postId, memberId, request);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
@@ -95,5 +94,24 @@ public class PostsController {
 			@RequestHeader("memberId") Long memberId) {
 		LikeResponse response = postsService.toggleLike(postId, memberId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(response));
+	}
+
+	@Operation(summary = "API 명세서 v0.3 line 47", description = "북마크 토글")
+	@PutMapping("/{postId}/bookmark")
+	public ResponseEntity<ApiResponse<PostBookmarkResponse>> toggleBookmark(
+			@RequestHeader("memberId") Long memberId,
+			@PathVariable Long postId) {
+		PostBookmarkResponse response = postsService.toggleBookmark(postId, memberId);
+		return ResponseEntity.ok(ApiResponse.onSuccess(response));
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 48", description = "콘텐츠 신고")
+	@PostMapping("/{postId}/report")
+	public ResponseEntity<ApiResponse<Void>> reportPost(
+			@PathVariable Long postId,
+			@RequestHeader("memberId") Long memberId,
+			@RequestBody ReportRequest reportRequest) {
+		postsService.reportPost(postId, memberId, reportRequest);
+		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 }

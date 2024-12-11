@@ -3,40 +3,40 @@ package myaong.popolog.blogservice.service;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.Prefix;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
-import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
+import myaong.popolog.blogservice.dto.request.ReportRequest;
 import myaong.popolog.blogservice.dto.response.*;
-import myaong.popolog.blogservice.entity.Like;
-import myaong.popolog.blogservice.entity.Post;
-import myaong.popolog.blogservice.entity.Profile;
+import myaong.popolog.blogservice.entity.*;
+import myaong.popolog.blogservice.enums.ContentsType;
 import myaong.popolog.blogservice.feign.constant.NotificationType;
 import myaong.popolog.blogservice.feign.service.NotificationFeignService;
-import myaong.popolog.blogservice.repository.BookmarkRepository;
-import myaong.popolog.blogservice.repository.LikeRepository;
-import myaong.popolog.blogservice.repository.PostRepository;
+import myaong.popolog.blogservice.repository.*;
 import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
-import myaong.popolog.blogservice.repository.ProfileRepository;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static io.micrometer.common.util.StringUtils.isBlank;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class PostsServiceImpl implements PostsService {
 
+    private final ProfileQueryService profileQueryService;
+    private final S3ApiService s3ApiService;
+    private final NotificationFeignService notificationFeignService;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final NotificationFeignService notificationFeignService;
-    private final ProfileRepository profileRepository;
-    private final S3ApiService s3ApiService;
+    private final ReportRepository reportRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public PostDetailResponse getPostDetails(Long postId, Long memberId) {
@@ -86,13 +86,23 @@ public class PostsServiceImpl implements PostsService {
     }
 
     @Override
-    public PostsResponse getPostsOf(Long memberId, Long lastId) {
+    public PostsResponse getPostsOf(Long requesterId, Long memberId, Long lastId) {
         // lastId 검증
         validateLastId(lastId);
+
         // 회원 프로필 검증
-        validateProfileExists(memberId);
+        Profile profile = profileQueryService.findById(memberId);
+
         // 게시물 조회
-        List<Post> postList = postRepository.findTop10ByOrderByIdDesc();
+        List<Post> postList;
+        if (lastId == 0) {
+            // lastId가 0일 경우, 최근 게시물부터 조회
+            postList = postRepository.findTop10ByProfileOrderByIdDesc(profile);
+        } else {
+            // lastId가 0이 아닐 경우, 해당 ID보다 작은 게시물 조회
+            postList = postRepository.findTop10ByProfileAndIdLessThanOrderByIdDesc(profile, lastId);
+        }
+
         // 응답 데이터 준비
         List<PostsResponse.Posts> posts = new ArrayList<>();
         long minId = Long.MAX_VALUE;
@@ -101,7 +111,9 @@ public class PostsServiceImpl implements PostsService {
             if (postId.compareTo(minId) < 0) {
                 minId = postId;
             }
-            boolean isBookmarked = bookmarkRepository.existsByPostAndMemberId(p, memberId);
+
+            boolean isBookmarked = requesterId != null && bookmarkRepository.existsByPostAndMemberId(p, requesterId);
+
             PostsResponse.Posts post = PostsResponse.Posts.builder()
                     .postId(postId)
                     .title(p.getTitle())
@@ -110,6 +122,7 @@ public class PostsServiceImpl implements PostsService {
                     .likeCount(p.getLikes().size())
                     .isBookmarked(isBookmarked)
                     .build();
+
             posts.add(post);
         }
 
@@ -117,6 +130,7 @@ public class PostsServiceImpl implements PostsService {
         if (postList.size() < 10) {
             minId = -1L;
         }
+
         return PostsResponse.builder()
                 .lastId(minId)
                 .posts(posts)
@@ -126,20 +140,15 @@ public class PostsServiceImpl implements PostsService {
     @Override
     public PostCreateResponse createPost(Long memberId, PostCreateRequest request) {
         // 작성자 프로필 검증
-        Profile profile = profileRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND));
+        Profile profile = profileQueryService.findById(memberId);
 
-        // 이미지 URL 이동 처리 (임시 저장소 -> 영구 저장소)
-        if (request.getPicUrl() != null && !request.getPicUrl().isEmpty()) {
-            String persistentPicUrl = s3ApiService.moveToPersistentStorage(request.getPicUrl());
-            request.setPicUrl(persistentPicUrl); // URL 업데이트
-        }
+        String newContent = processImgUrl(request.getContent(), s3ApiService::moveToPersistentStorage);
 
         // 게시물 저장
         Post post = postRepository.save(Post.builder()
                 .profile(profile)
                 .title(request.getTitle())
-                .content(request.getContent())
+                .content(newContent)
                 .isBlinded(false)
                 .build());
 
@@ -150,35 +159,31 @@ public class PostsServiceImpl implements PostsService {
     }
 
     @Override
-    public void updatePost(Long postId, Long memberId, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+    public void updatePost(Long postId, Long memberId, PostCreateRequest request) {
 
-        if (!post.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
-        }
+        Profile profile = profileQueryService.findById(memberId);
+        Post post = validatePermissionAndGetPostById(profile, postId);
 
-        // 제목 및 내용 공백 여부 확인
-        if (isBlank(request.getTitle()) || isBlank(request.getContent())) {
-            throw new ApiException(ApiCode.INVALID_DATA);
-        }
+        // 기존 포스트의 이미지 이동
+        processImgUrl(post.getContent(), s3ApiService::moveToTempStorage);
 
-        if (request.getTitle() != null) post.updateTitle(request.getTitle());
-        if (request.getContent() != null) post.updateContent(request.getContent());
+        // 새 포스트의 이미지 URL도 temp에 있는 것으로 변환
+        String newContent = processImgUrl(request.getContent(), s3ApiService::replacePersistentToTemp);
+
+        // 새 포스트 이미지 변환
+        newContent = processImgUrl(newContent, s3ApiService::moveToPersistentStorage);
+
+        post.updateTitle(request.getTitle());
+        post.updateContent(newContent);
 
         postRepository.save(post);
     }
 
     @Override
     public void deletePost(Long postId, Long memberId) {
-        // 게시물 조회
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
-        // 작성자 확인
-        if (!post.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
-        }
+        Profile profile = profileQueryService.findById(memberId);
+        Post post = validatePermissionAndGetPostById(profile, postId);
 
         // 게시물 삭제
         postRepository.delete(post);
@@ -194,6 +199,29 @@ public class PostsServiceImpl implements PostsService {
                 .build();
     }
 
+    private Post validatePermissionAndGetPostById(Profile profile, Long postId) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+        if (!post.getProfile().equals(profile)) {
+            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
+        }
+
+        return post;
+    }
+
+    private String processImgUrl(String html, Function<String, String> function) {
+        Document doc = Jsoup.parse(html);
+        Elements imgUrls = doc.select("img");
+
+        // img src 변환
+        for (Element imgUrl : imgUrls) {
+            imgUrl.attr("src", function.apply(imgUrl.attr("src")));
+        }
+
+        return doc.select("body").html();
+    }
 
     @Override
     public LikeResponse toggleLike(Long postId, Long memberId) {
@@ -227,8 +255,7 @@ public class PostsServiceImpl implements PostsService {
 
     private void sendLikeNotification(Post post, Long memberId) {
         // 좋아요를 누른 사용자의 닉네임 가져오기
-        String likerNickname = profileRepository.findById(memberId)
-                .orElseThrow(() -> new ApiException(ApiCode.MEMBER_NOT_FOUND))
+        String likerNickname = profileQueryService.findById(memberId)
                 .getNickname(); // 닉네임 가져오기
 
         // 알림 제목 생성
@@ -246,14 +273,75 @@ public class PostsServiceImpl implements PostsService {
         }
     }
 
-    private void validateProfileExists(Long memberId) {
-        boolean exists = profileRepository.existsById(memberId);
-        if (!exists) {
-            throw new ApiException(ApiCode.MEMBER_NOT_FOUND);
-        }
-    }
-
     private String truncateContent(String content) {
         return content.length() > 400 ? content.substring(0, 400) : content;
+    }
+
+    @Override
+    public PostBookmarkResponse toggleBookmark(Long postId, Long memberId) {
+        // 게시물 조회
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+
+        // 회원 프로필 조회
+        Profile profile = profileQueryService.findById(memberId);
+
+        // 북마크 여부 확인
+        Optional<Bookmark> existingBookmark = bookmarkRepository.findByPostAndProfile(post, profile);
+
+        boolean isBookmarked;
+
+        if (existingBookmark.isPresent()) {
+            // 이미 북마크가 존재하면 삭제
+            bookmarkRepository.delete(existingBookmark.get());
+            isBookmarked = false;
+        } else {
+            // 북마크가 없으면 생성
+            Bookmark bookmark = Bookmark.builder()
+                    .profile(profile)
+                    .post(post)
+                    .build();
+            bookmarkRepository.save(bookmark);
+            isBookmarked = true;
+        }
+
+        return PostBookmarkResponse.builder()
+                .bookmark(isBookmarked)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void reportPost(Long postId, Long memberId, ReportRequest request) {
+        // 콘텐츠 존재 여부 확인
+        ContentsType contentsType = request.getContentType();
+
+        if (contentsType == ContentsType.POST) {
+            postRepository.findById(request.getContentId())
+                    .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+        } else if (contentsType == ContentsType.COMMENT) {
+            commentRepository.findById(request.getContentId())
+                    .orElseThrow(() -> new ApiException(ApiCode.COMMENT_NOT_FOUND));
+        }
+
+        // 중복 신고 여부 확인
+        boolean isAlreadyReported = reportRepository.existsByProfileIdAndContentsIdAndContentsType(
+                memberId, request.getContentId(), contentsType);
+
+        if (isAlreadyReported) {
+            throw new ApiException(ApiCode.REPORT_DUPLICATED);
+        }
+
+        // 신고한 회원 정보 확인
+        Profile profile = profileQueryService.findById(memberId);
+
+        // 신고 데이터 생성 및 저장
+        Report report = Report.builder()
+                .profile(profile)
+                .contentsId(request.getContentId())
+                .contentsType(contentsType)
+                .build();
+
+        reportRepository.save(report);
     }
 }
