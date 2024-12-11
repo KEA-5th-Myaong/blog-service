@@ -318,7 +318,7 @@ public class PostsServiceImpl implements PostsService {
 
     @Override
     @Transactional
-    public void reportPost(Long postId, Long memberId, ReportRequest request) {
+    public void reportPost(Long memberId, ReportRequest request) {
         // 콘텐츠 존재 여부 확인
         ContentsType contentsType = request.getContentType();
 

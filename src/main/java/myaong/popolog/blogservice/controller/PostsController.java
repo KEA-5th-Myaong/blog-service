@@ -106,12 +106,11 @@ public class PostsController {
 	}
 
 	@Operation(summary = "API 명세서 v0.4 line 48", description = "콘텐츠 신고")
-	@PostMapping("/{postId}/report")
+	@PostMapping("/report")
 	public ResponseEntity<ApiResponse<Void>> reportPost(
-			@PathVariable Long postId,
 			@RequestHeader("memberId") Long memberId,
 			@RequestBody ReportRequest reportRequest) {
-		postsService.reportPost(postId, memberId, reportRequest);
+		postsService.reportPost(memberId, reportRequest);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
 }
