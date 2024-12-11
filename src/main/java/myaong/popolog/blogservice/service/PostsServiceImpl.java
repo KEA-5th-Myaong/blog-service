@@ -185,6 +185,12 @@ public class PostsServiceImpl implements PostsService {
         Profile profile = profileQueryService.findById(memberId);
         Post post = validatePermissionAndGetPostById(profile, postId);
 
+        // 기존 포스트 이미지 삭제
+        processImgUrl(post.getContent(), img -> {
+            s3ApiService.deleteFromPersistentStorage(img);
+            return null;
+        });
+
         // 게시물 삭제
         postRepository.delete(post);
     }
