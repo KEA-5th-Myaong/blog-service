@@ -5,15 +5,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
-import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
 import myaong.popolog.blogservice.dto.request.ReportRequest;
 import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.service.PostsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/blog/posts")
@@ -75,7 +72,7 @@ public class PostsController {
 	@PutMapping("/{postId}")
 	public ResponseEntity<ApiResponse<Void>> updatePost(
 			@PathVariable Long postId,
-			@RequestBody PostUpdateRequest request,
+			@RequestBody PostCreateRequest request,
 			@RequestHeader("memberId") Long memberId) {
 		postsService.updatePost(postId, memberId, request);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));

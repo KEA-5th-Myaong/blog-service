@@ -3,7 +3,6 @@ package myaong.popolog.blogservice.service;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.Prefix;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
-import myaong.popolog.blogservice.dto.request.PostUpdateRequest;
 import myaong.popolog.blogservice.dto.request.ReportRequest;
 import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.entity.*;
@@ -19,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static io.micrometer.common.util.StringUtils.isBlank;
 
 @Service
 @RequiredArgsConstructor
@@ -155,9 +152,10 @@ public class PostsServiceImpl implements PostsService {
     }
 
     @Override
-    public void updatePost(Long postId, Long memberId, PostUpdateRequest request) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+    public void updatePost(Long postId, Long memberId, PostCreateRequest request) {
+
+        Profile profile = profileQueryService.findById(memberId);
+        Post post = validatePermissionAndGetPostById(profile, postId);
 
         if (!post.getProfile().getId().equals(memberId)) {
             throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
@@ -176,14 +174,9 @@ public class PostsServiceImpl implements PostsService {
 
     @Override
     public void deletePost(Long postId, Long memberId) {
-        // 게시물 조회
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
-        // 작성자 확인
-        if (!post.getProfile().getId().equals(memberId)) {
-            throw new ApiException(ApiCode.READ_ONLY_ACCESS_POST);
-        }
+        Profile profile = profileQueryService.findById(memberId);
+        Post post = validatePermissionAndGetPostById(profile, postId);
 
         // 게시물 삭제
         postRepository.delete(post);
