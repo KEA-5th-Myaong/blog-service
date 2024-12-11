@@ -72,8 +72,8 @@ public class Profile extends BaseEntity {
 		this.profilePicUrl = profilePicUrl;
 	}
 
-	public void updateNameAndBlogIntro(String name, String blogIntro) {
-		this.name = name;
+	public void updateNameAndBlogIntro(String nickname, String blogIntro) {
+		this.nickname = nickname;
 		this.blogIntro = blogIntro;
 	}
 }
