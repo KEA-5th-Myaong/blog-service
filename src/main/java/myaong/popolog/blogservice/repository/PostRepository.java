@@ -26,9 +26,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, QPostReposito
 	// 특정 ID 목록에 해당하는 게시물 조회 (for ReportedContents)
 	@Query("SELECT p FROM Post p WHERE p.id IN :postIds")
 	List<Post> findPostsByIds(@Param("postIds") List<Long> postIds);
-
-	@Modifying
-	@Query("UPDATE Post p SET p.isBlinded = :isBlinded WHERE p.id = :postId")
-	void updateBlindedStatus(@Param("postId") Long postId, @Param("isBlinded") Boolean isBlinded);
 }
 

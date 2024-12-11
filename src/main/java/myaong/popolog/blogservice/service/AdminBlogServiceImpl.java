@@ -77,9 +77,7 @@ public class AdminBlogServiceImpl implements AdminBlogService {
 
         // 상태 반전
         comment.toggleBlind();
-
-        // Custom Query로 필요한 필드만 업데이트
-        commentRepository.updateBlindedStatus(comment.getId(), comment.getIsBlinded());
+        commentRepository.save(comment);
 
         // 응답 생성
         return BlindToggleResponse.builder() // 이름 수정
@@ -95,7 +93,7 @@ public class AdminBlogServiceImpl implements AdminBlogService {
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
         post.toggleBlind();
-        postRepository.updateBlindedStatus(post.getId(), post.getIsBlinded());
+        postRepository.save(post);
 
         return BlindToggleResponse.builder() // 이름 수정
                 .blinded(post.getIsBlinded())

@@ -51,7 +51,7 @@ public class AdminReportedContentsResponse {
                                 Comment comment = commentMap.get(r.getContentsId());
                                 return ReportedContent.builder()
                                         .postId(comment.getPost().getId()) // Post 객체에서 ID 추출
-                                        .title(null)
+                                        .title(comment.getPost().getTitle())
                                         .contentsType("COMMENT")
                                         .contentsId(r.getContentsId())
                                         .content(comment.getContent())
