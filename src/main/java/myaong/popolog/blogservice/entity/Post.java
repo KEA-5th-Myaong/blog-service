@@ -49,6 +49,15 @@ public class Post extends BaseEntity {
 		this.isBlinded = isBlinded;
 	}
 
+	public void updateTitle(String title) {
+		this.title = title;
+	}
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
+
+
 	public void toggleBlind() {
 		this.isBlinded = !this.isBlinded;
 	}

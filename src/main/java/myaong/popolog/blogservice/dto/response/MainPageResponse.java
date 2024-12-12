@@ -18,13 +18,14 @@ public class MainPageResponse {
 	public static class PostDTO {
 		private Long postId;
 		private String title;
-		private String thumbnailUrl;
 		private String content;
 		private LocalDateTime timestamp;
 		private Long memberId;
 		private String username;
 		private String nickname;
 		private String profilePicUrl;
+		private List<String> prejob;
+		private Long likeCount;
 		private Boolean isBookmarked;
 	}
 }

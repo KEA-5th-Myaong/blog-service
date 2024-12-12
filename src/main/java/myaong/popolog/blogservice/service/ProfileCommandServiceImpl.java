@@ -44,7 +44,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 
 	private void deleteProfilePic(Profile profile) {
 
-		if (!profile.getProfilePicUrl().isEmpty()) {
+		if (profile.getProfilePicUrl() != null) {
 			s3ApiService.deleteFromPersistentStorage(profile.getProfilePicUrl());
 		}
 	}
@@ -54,6 +54,9 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 
 		Profile profile = profileQueryService.findById(memberId);
 		deleteProfilePic(profile);
+
+		profile.updateProfilePicUrl(null);
+		profileRepository.save(profile);
 
 		return null;
 	}
@@ -68,6 +71,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 		String profilePicUrl = s3ApiService.uploadToPersistentStorage(Prefix.PROFILE, pic);
 
 		profile.updateProfilePicUrl(profilePicUrl);
+		profileRepository.save(profile);
 
 		return new ProfilePicUrlResponse(profilePicUrl);
 	}
@@ -76,7 +80,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	public void updateProfile(Long memberId, UpdateProfileRequest req) {
 
 		Profile profile = profileQueryService.findById(memberId);
-		profile.updateNameAndBlogIntro(req.getName(), req.getBlogIntro());
+		profile.updateNameAndBlogIntro(req.getNickname(), req.getBlogIntro());
 	}
 
 	@Override

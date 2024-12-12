@@ -1,9 +1,9 @@
 package myaong.popolog.blogservice.repository;
 
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import myaong.popolog.blogservice.dto.SortedEntity;
 import myaong.popolog.blogservice.entity.Post;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.entity.QPrejob;
@@ -87,7 +87,7 @@ public class QPostRepositoryImpl implements QPostRepository {
 	}
 
 	@Override
-	public List<Tuple> findByProfile_Bookmark(Profile member) {
+	public List<SortedEntity<Post>> findByProfile_Bookmark(Profile member) {
 
 		return jpaQueryFactory
 				.select(post, bookmark.id)
@@ -97,11 +97,14 @@ public class QPostRepositoryImpl implements QPostRepository {
 				.where(bookmark.profile.eq(member))
 				.orderBy(bookmark.id.desc())
 				.limit(10)
-				.fetch();
+				.fetch()
+				.stream()
+				.map(tuple -> new SortedEntity<>(tuple.get(post), tuple.get(bookmark.id)))
+				.toList();
 	}
 
 	@Override
-	public List<Tuple> findByProfile_Bookmark(Profile member, Long lastId) {
+	public List<SortedEntity<Post>> findByProfile_Bookmark(Profile member, Long lastId) {
 
 		return jpaQueryFactory
 				.select(post, bookmark.id)
@@ -112,6 +115,9 @@ public class QPostRepositoryImpl implements QPostRepository {
 						bookmark.id.lt(lastId))
 				.orderBy(bookmark.id.desc())
 				.limit(10)
-				.fetch();
+				.fetch()
+				.stream()
+				.map(tuple -> new SortedEntity<>(tuple.get(post), tuple.get(bookmark.id)))
+				.toList();
 	}
 }

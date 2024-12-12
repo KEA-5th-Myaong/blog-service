@@ -11,6 +11,7 @@ import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
+    boolean existsByProfileIdAndContentsIdAndContentsType(Long memberId, Long contentsId, ContentsType contentsType);
 
     @Query("SELECT r FROM Report r WHERE (:lastId = 0 OR r.id < :lastId) ORDER BY r.id DESC")
     List<Report> findByLastId(@Param("lastId") Long lastId);
@@ -18,4 +19,3 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @Query("SELECT r.contentsId, COUNT(r) FROM Report r GROUP BY r.contentsId")
     List<Object[]> countReportsByContents();
 }
-
