@@ -19,17 +19,14 @@ public class Comment extends BaseEntity {
 	@Column(name = "comment_id")
 	private Long id;
 
-	// 본 댓글이 달린 포스트
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false, updatable = false)
 	private Post post;
 
-	// 댓글 작성자. 작성자 탈퇴 시 null
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", updatable = false)
 	private Profile profile;
 
-	// 답글인 경우, 본 답글이 달린 댓글. 댓글인 경우 null
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_comment_id", updatable = false)
 	private Comment parentComment;
@@ -53,7 +50,13 @@ public class Comment extends BaseEntity {
 
 		post.getComments().add(this);
 	}
+
 	public void updateContent(String content) {
 		this.content = content;
 	}
+
+	public void toggleBlind() {
+		this.isBlinded = !this.isBlinded; // 상태를 반전시킴
+	}
+
 }
