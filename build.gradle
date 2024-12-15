@@ -62,6 +62,9 @@ dependencies {
     // prometheus
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
+    // spring cloud kubernetes
+    implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client-all' // discovery client, config client, LoadBalancer 사용
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
