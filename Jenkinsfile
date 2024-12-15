@@ -73,26 +73,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Connect Bastion') {
-            steps {
-                script {
-                    def newBuildId = "${env.BUILD_ID.toInteger()}"
-                    sshagent (credentials: ['bastion-ssh']) {
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ${bastionUsername}@${bastionIp} '
-                            # Pull the Docker image
-                            docker pull ${env.fullImageName}:${newBuildId}
-
-                            # 이전 태그의 Docker 이미지 삭제
-                            docker rmi ${env.fullImageName}:${env.BUILD_ID.toInteger() - 1} || true
-                        '
-                        """
-                    }
-                }
-            }
-        }
-
     }
 
     post {
