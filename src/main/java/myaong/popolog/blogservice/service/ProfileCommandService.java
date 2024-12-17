@@ -1,10 +1,13 @@
 package myaong.popolog.blogservice.service;
 
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.request.PrejobsRequest;
 import myaong.popolog.blogservice.dto.request.UpdateProfileRequest;
 import myaong.popolog.blogservice.dto.response.FollowResponse;
 import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface ProfileCommandService {
 
@@ -17,4 +20,6 @@ public interface ProfileCommandService {
 	void updateProfile(Long memberId, UpdateProfileRequest req);
 
 	FollowResponse followProfile(Long requesterId, Long memberId);
+
+	void createProfilePrejobs(Long memberId, List<PrejobsRequest> requests);
 }

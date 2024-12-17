@@ -5,9 +5,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.request.PrejobsRequest;
 import myaong.popolog.blogservice.dto.request.UpdateProfileRequest;
 import myaong.popolog.blogservice.dto.response.*;
 import myaong.popolog.blogservice.service.ProfileCommandService;
@@ -15,6 +17,8 @@ import myaong.popolog.blogservice.service.ProfileQueryService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Validated
 @RestController
@@ -38,6 +42,16 @@ public class ProfileController {
 	public ProfileResponse getProfile(@RequestHeader(name = "memberId") Long memberId) {
 
 		return profileQueryService.getProfileByMemberId(memberId);
+	}
+
+	@Operation(summary = "서비스간 API v0.4 line 8", description = "블로그 관심 직군 동기화")
+	@PostMapping("/prejobs")
+	public Object createPrejobs(@RequestHeader(name = "memberId") Long memberId,
+								@Size(min = 1, max = 5, message = "관심직군 목록 전달에 문제가 발생했습니다.")
+								@Valid @RequestBody List<PrejobsRequest> requests) {
+
+		profileCommandService.createProfilePrejobs(memberId, requests);
+		return null;
 	}
 
 	@Operation(summary = "API 명세서 v0.4 line 31", description = "회원 정보 조회 (블로그 접속 시)")

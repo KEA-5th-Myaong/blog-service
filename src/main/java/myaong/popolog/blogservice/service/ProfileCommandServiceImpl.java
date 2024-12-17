@@ -6,18 +6,23 @@ import myaong.popolog.blogservice.common.exception.ApiCode;
 import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.converter.ProfileConverter;
 import myaong.popolog.blogservice.dto.request.NewProfileRequest;
+import myaong.popolog.blogservice.dto.request.PrejobsRequest;
 import myaong.popolog.blogservice.dto.request.UpdateProfileRequest;
 import myaong.popolog.blogservice.dto.response.FollowResponse;
 import myaong.popolog.blogservice.dto.response.ProfilePicUrlResponse;
 import myaong.popolog.blogservice.entity.Follow;
+import myaong.popolog.blogservice.entity.Prejob;
 import myaong.popolog.blogservice.entity.Profile;
 import myaong.popolog.blogservice.feign.constant.NotificationType;
 import myaong.popolog.blogservice.feign.service.NotificationFeignService;
 import myaong.popolog.blogservice.repository.FollowRepository;
+import myaong.popolog.blogservice.repository.PrejobRepository;
 import myaong.popolog.blogservice.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 	private final ProfileConverter profileConverter;
 	private final S3ApiService s3ApiService;
 	private final NotificationFeignService notificationFeignService;
+	private final PrejobRepository prejobRepository;
 
 	@Override
 	public void createProfile(NewProfileRequest newProfileRequest) {
@@ -123,5 +129,26 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
 			);
 		}
 		return followResponse;
+	}
+
+	@Override
+	public void createProfilePrejobs(Long memberId, List<PrejobsRequest> requests) {
+
+		Profile profile = profileQueryService.findById(memberId);
+
+		// 기존 prejobs 삭제
+		prejobRepository.deleteByProfile(profile);
+
+		// 요청된 prejobs 생성
+		for (PrejobsRequest request : requests) {
+
+			Prejob prejob = Prejob.builder()
+					.id(request.getMemberPrejobId())
+					.profile(profile)
+					.jobId(request.getJobId())
+					.jobName(request.getJobName())
+					.build();
+			prejobRepository.save(prejob);
+		}
 	}
 }
