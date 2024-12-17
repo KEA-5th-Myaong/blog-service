@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table(name = "`post`")
+@Table(name = "`post`",
+		uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "title"})})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
@@ -56,7 +57,6 @@ public class Post extends BaseEntity {
 	public void updateContent(String content) {
 		this.content = content;
 	}
-
 
 	public void toggleBlind() {
 		this.isBlinded = !this.isBlinded;
