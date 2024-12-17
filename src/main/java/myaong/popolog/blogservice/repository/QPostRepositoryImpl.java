@@ -120,4 +120,27 @@ public class QPostRepositoryImpl implements QPostRepository {
 				.map(tuple -> new SortedEntity<>(tuple.get(post), tuple.get(bookmark.id)))
 				.toList();
 	}
+
+	@Override
+	public List<Post> searchByTitleAndContent(String query) {
+
+		return jpaQueryFactory
+				.selectFrom(post)
+				.where(post.title.like("%" + query + "%").or(post.content.like("%" + query + "%")))
+				.orderBy(post.id.desc())
+				.limit(10)
+				.fetch();
+	}
+
+	@Override
+	public List<Post> searchByTitleAndContent(String query, Long lastId) {
+
+		return jpaQueryFactory
+				.selectFrom(post)
+				.where(post.title.like("%" + query + "%").or(post.content.like("%" + query + "%")),
+						post.id.lt(lastId))
+				.orderBy(post.id.desc())
+				.limit(10)
+				.fetch();
+	}
 }

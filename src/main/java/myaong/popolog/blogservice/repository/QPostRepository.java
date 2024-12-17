@@ -19,4 +19,8 @@ public interface QPostRepository {
 	List<SortedEntity<Post>> findByProfile_Bookmark(Profile member);
 
 	List<SortedEntity<Post>> findByProfile_Bookmark(Profile member, Long lastId);
+  
+	List<Post> searchByTitleAndContent(String query);
+
+	List<Post> searchByTitleAndContent(String query, Long lastId);
 }
