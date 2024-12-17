@@ -62,13 +62,12 @@ public class BlogController {
 	}
 
 	@Operation(summary = "API 명세서 v0.4 line 29", description = "포스트 검색")
-	@GetMapping("/search/{lastId}")
-	public ResponseEntity<ApiResponse<MainPageResponse>> getSearch(@RequestParam(name = "search") String search,
-																@PathVariable @PositiveOrZero(message = "lastId는 0 이상이어야 합니다.") Long lastId) {
+	@GetMapping("/search/content/{lastId}")
+	public ResponseEntity<ApiResponse<MainPageResponse>> getSearch(@RequestParam(name = "search") String query,
+																   @RequestHeader("memberId") Long memberId,
+																   @PathVariable @PositiveOrZero(message = "lastId는 0 이상이어야 합니다.") Long lastId) {
 
-		//TODO: 검색 구현 필요 : mainPageService.search(search, lastId)
-		// - 검색 시에는 자기 포스트도 조회 가능
-		MainPageResponse res = mainPageService.getRecentPosts(lastId);
+		MainPageResponse res = mainPageService.searchPosts(memberId, query, lastId);
 
 		return ResponseEntity.ok(ApiResponse.onSuccess(res));
 	}

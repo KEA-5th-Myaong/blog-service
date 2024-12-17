@@ -13,4 +13,6 @@ public interface MainPageService {
 	MainPageResponse getFollowingPosts(Long memberId, Long lastId);
 
 	MainPageResponse getBookmarkedPosts(Long memberId, Long lastId);
+
+	MainPageResponse searchPosts(Long memberId, String query, Long lastId);
 }

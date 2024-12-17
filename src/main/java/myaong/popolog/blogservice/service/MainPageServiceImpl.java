@@ -87,4 +87,19 @@ public class MainPageServiceImpl implements MainPageService {
 
 		return mainPageConverter.toMainPageResponseBookmarked(tupleList);
 	}
+
+	@Override
+	public MainPageResponse searchPosts(Long memberId, String query, Long lastId) {
+
+		Profile member = profileQueryService.findById(memberId);
+
+		List<Post> postList;
+		if (lastId.equals(0L)) {
+			postList = postRepository.searchByTitleAndContent(query);
+		} else {
+			postList = postRepository.searchByTitleAndContent(query, lastId);
+		}
+
+		return mainPageConverter.toMainPageResponse(postList, member);
+	}
 }
