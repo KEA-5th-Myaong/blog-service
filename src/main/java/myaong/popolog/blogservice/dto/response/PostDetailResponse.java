@@ -1,39 +1,35 @@
 package myaong.popolog.blogservice.dto.response;
 import lombok.Builder;
 import lombok.Getter;
-import myaong.popolog.blogservice.entity.Comment;
-import myaong.popolog.blogservice.entity.Post;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Getter
 @Builder
 public class PostDetailResponse {
-
+    private Long postId;
     private String title;
     private String content;
     private LocalDateTime timestamp;
     private Long memberId;
+    private String username;
     private String nickname;
     private String profilePicUrl;
     private int likeCount;
+    private boolean isLiked;
     private boolean isBookmarked;
     private int commentCount;
-    private List<CommentResponse> comments;
+    private List<Comment> comments;
 
-    public static PostDetailResponse of(Post post, List<Comment> comments, boolean isBookmarked) {
-        return PostDetailResponse.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .timestamp(post.getCreatedAt())
-                .memberId(post.getProfile() != null ? post.getProfile().getId() : null)
-                .nickname(post.getProfile() != null ? post.getProfile().getNickname() : null)
-                .profilePicUrl(post.getProfile() != null ? post.getProfile().getProfilePicUrl() : null)
-                .likeCount(post.getLikes().size())
-                .isBookmarked(isBookmarked)
-                .commentCount(comments.size())
-                .comments(comments.stream().map(CommentResponse::of).toList())
-                .build();
+    @Getter
+    @Builder
+    public static class Comment {
+        private String profilePicUrl;
+        private Long memberId;
+        private String nickname;
+        private Long commentId;
+        private Long parentCommentId;
+        private String comment;
+        private LocalDateTime timestamp;
     }
 }

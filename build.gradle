@@ -59,6 +59,12 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // spring cloud kubernetes
+    implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client-all' // discovery client, config client, LoadBalancer 사용
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -66,6 +72,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Jsoup : HTML parsing
+    implementation 'org.jsoup:jsoup:1.18.3'
 }
 
 /**** QueryDSL config start ****/

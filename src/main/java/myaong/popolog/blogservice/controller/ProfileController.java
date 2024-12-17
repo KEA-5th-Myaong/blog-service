@@ -55,27 +55,6 @@ public class ProfileController {
 		return ApiResponse.onSuccess(profileQueryService.getProfileByUsername(username));
 	}
 
-	@Operation(summary = "API 명세서 v0.4 line 53", description = "프로필 사진 수정")
-	@PostMapping("/pic")
-	public ApiResponse<ProfilePicUrlResponse> updateProfilePic(@RequestHeader("memberId") Long memberId,
-															   @RequestParam(value = "pic", required = false) MultipartFile pic) {
-
-		if (pic == null || pic.isEmpty()) {
-			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId));
-		} else {
-			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId, pic));
-		}
-	}
-
-	@Operation(summary = "API 명세서 v0.4 line 54", description = "프로필 정보 수정")
-	@PutMapping
-	public ApiResponse<Object> updateProfile(@RequestHeader("memberId") Long memberId,
-											 @Valid @RequestBody UpdateProfileRequest req) {
-
-		profileCommandService.updateProfile(memberId, req);
-		return ApiResponse.onSuccess(null);
-	}
-
 	@Operation(summary = "API 명세서 v0.4 line 50", description = "팔로우 토글")
 	@PostMapping("/{memberId}/follow")
 	public ApiResponse<FollowResponse> followProfile(@RequestHeader("memberId") Long requesterId,
@@ -101,4 +80,26 @@ public class ProfileController {
 
 		return ApiResponse.onSuccess(profileQueryService.getProfileFollowedList(requesterId, memberId, lastId));
 	}
+
+	@Operation(summary = "API 명세서 v0.4 line 53", description = "프로필 사진 수정")
+	@PostMapping("/pic")
+	public ApiResponse<ProfilePicUrlResponse> updateProfilePic(@RequestHeader("memberId") Long memberId,
+															   @RequestParam(value = "profilePic", required = false) MultipartFile pic) {
+
+		if (pic == null || pic.isEmpty()) {
+			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId));
+		} else {
+			return ApiResponse.onSuccess(profileCommandService.updateProfilePic(memberId, pic));
+		}
+	}
+
+	@Operation(summary = "API 명세서 v0.4 line 54", description = "프로필 정보 수정")
+	@PutMapping
+	public ApiResponse<Object> updateProfile(@RequestHeader("memberId") Long memberId,
+											 @Valid @RequestBody UpdateProfileRequest req) {
+
+		profileCommandService.updateProfile(memberId, req);
+		return ApiResponse.onSuccess(null);
+	}
+
 }

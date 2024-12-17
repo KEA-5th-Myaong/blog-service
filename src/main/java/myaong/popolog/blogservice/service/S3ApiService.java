@@ -31,6 +31,10 @@ public class S3ApiService {
 		return url.substring(url.lastIndexOf(bucketName) + bucketName.length() + 1);
 	}
 
+	public String replacePersistentToTemp(String url) {
+		return url.replace(PERSISTENT_BUCKET_NAME, TEMP_BUCKET_NAME);
+	}
+
 	/**
 	 * 콘텐츠가 DB에 저장되기 전이라면, 파일을 임시로 저장합니다.
 	 * 임시 저장소에 저장된 파일은 24시간 후 자동으로 삭제됩니다.

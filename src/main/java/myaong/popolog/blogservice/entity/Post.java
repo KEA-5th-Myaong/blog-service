@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table(name = "`post`")
+@Table(name = "`post`",
+		uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "title"})})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseEntity {
@@ -19,7 +20,6 @@ public class Post extends BaseEntity {
 	@Column(name = "post_id")
 	private Long id;
 
-	// 작성자 정보
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Profile profile;
@@ -36,13 +36,11 @@ public class Post extends BaseEntity {
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> comments;
 
-	//***** cascade 설정 *****//
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Like> likes;
 
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Bookmark> bookmarks;
-	//***** cascade 설정 끝 *****//
 
 	@Builder
 	public Post(Profile profile, String title, String content, Boolean isBlinded) {
@@ -50,5 +48,17 @@ public class Post extends BaseEntity {
 		this.title = title;
 		this.content = content;
 		this.isBlinded = isBlinded;
+	}
+
+	public void updateTitle(String title) {
+		this.title = title;
+	}
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
+
+	public void toggleBlind() {
+		this.isBlinded = !this.isBlinded;
 	}
 }

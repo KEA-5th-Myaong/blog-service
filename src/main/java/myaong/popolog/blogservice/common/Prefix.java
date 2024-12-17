@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum Prefix {
 
-	BLOG("blog"),
+	POST("post"),
 	PROFILE("profile"),
 	;
 
