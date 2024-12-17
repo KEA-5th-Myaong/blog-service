@@ -137,10 +137,19 @@ public class PostsServiceImpl implements PostsService {
                 .build();
     }
 
+    private void validateTitle_Profile(String title, Profile profile) {
+        if (postRepository.existsByTitleAndProfile(title, profile)) {
+            throw new ApiException(ApiCode.SAME_TITLE_CONFLICT);
+        }
+    }
+
     @Override
     public PostCreateResponse createPost(Long memberId, PostCreateRequest request) {
         // 작성자 프로필 검증
         Profile profile = profileQueryService.findById(memberId);
+
+        // 포스트 제목-프로필 중복 검증
+        validateTitle_Profile(request.getTitle(), profile);
 
         String newContent = processImgUrl(request.getContent(), s3ApiService::moveToPersistentStorage);
 
@@ -163,6 +172,9 @@ public class PostsServiceImpl implements PostsService {
 
         Profile profile = profileQueryService.findById(memberId);
         Post post = validatePermissionAndGetPostById(profile, postId);
+
+        // 포스트 제목-프로필 중복 검증
+        validateTitle_Profile(request.getTitle(), profile);
 
         // 기존 포스트의 이미지 이동
         processImgUrl(post.getContent(), s3ApiService::moveToTempStorage);

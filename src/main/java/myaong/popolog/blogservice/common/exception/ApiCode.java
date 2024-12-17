@@ -24,6 +24,7 @@ public enum ApiCode {
 	INVALID_PREJOBS(HttpStatus.BAD_REQUEST, "POST_4000", "회원의 관심 직군에 한해서만 요청할 수 있습니다."),
 	READ_ONLY_ACCESS_POST(HttpStatus.FORBIDDEN, "POST_4030", "You can only read this post"),
 	POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_4040", "존재하지 않는 포스트입니다."),
+	SAME_TITLE_CONFLICT(HttpStatus.CONFLICT, "POST_4090", "이미 동일한 제목의 포스트가 존재합니다."),
 	UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "POST_4150", "Unsupported Media Type"),
 
 	READ_ONLY_ACCESS_COMMENT(HttpStatus.FORBIDDEN, "COMMENT_4030", "You can only read this comment"),
