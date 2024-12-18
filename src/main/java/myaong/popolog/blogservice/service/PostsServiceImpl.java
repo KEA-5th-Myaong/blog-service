@@ -343,7 +343,7 @@ public class PostsServiceImpl implements PostsService {
     @Transactional
     public void reportPost(Long memberId, ReportRequest request) {
         // 콘텐츠 존재 여부 확인
-        ContentsType contentsType = request.getContentType();
+        ContentsType contentsType = ContentsType.valueOfLower(request.getContentType());
 
         if (contentsType == ContentsType.POST) {
             postRepository.findById(request.getContentId())

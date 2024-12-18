@@ -109,7 +109,7 @@ public class PostsController {
 	@PostMapping("/report")
 	public ResponseEntity<ApiResponse<Void>> reportPost(
 			@RequestHeader("memberId") Long memberId,
-			@RequestBody ReportRequest reportRequest) {
+			@RequestBody @Valid ReportRequest reportRequest) {
 		postsService.reportPost(memberId, reportRequest);
 		return ResponseEntity.ok(ApiResponse.onSuccess(null));
 	}
