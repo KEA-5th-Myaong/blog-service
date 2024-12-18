@@ -35,7 +35,7 @@ public class CommentService {
     public CommentPostResponse postComment(Long memberId, CommentPostRequest request) {
 
         // 게시물 조회
-        Post post = postRepository.findById(Long.valueOf(request.getPostId()))
+        Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
         // 댓글 작성자 프로필 조회

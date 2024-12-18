@@ -61,7 +61,7 @@ public class PostsServiceImpl implements PostsService {
     }
 
     private PostDetailResponse buildPostDetailResponse(Post post, Long memberId) {
-        List<PostDetailResponse.Comment> commentResponses = post.getComments().stream()
+        List<PostDetailResponse.Comment> commentResponses = commentRepository.findByPost(post).stream()
                 .map(comment -> PostDetailResponse.Comment.builder()
                         .profilePicUrl(comment.getProfile() != null ? comment.getProfile().getProfilePicUrl() : null)
                         .memberId(comment.getProfile() != null ? comment.getProfile().getId() : null)
@@ -88,7 +88,7 @@ public class PostsServiceImpl implements PostsService {
                 .likeCount(post.getLikes().size())
                 .isLiked(isLiked)
                 .isBookmarked(isBookmarked)
-                .commentCount(post.getComments().size())
+                .commentCount(commentRepository.countByPost(post))
                 .comments(commentResponses)
                 .build();
     }
