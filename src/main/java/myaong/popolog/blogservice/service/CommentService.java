@@ -7,6 +7,7 @@ import myaong.popolog.blogservice.common.exception.ApiException;
 import myaong.popolog.blogservice.dto.request.CommentPostRequest;
 import myaong.popolog.blogservice.dto.request.CommentUpdateRequest;
 import myaong.popolog.blogservice.dto.request.ReplyRequest;
+import myaong.popolog.blogservice.dto.request.ReplyUpdateRequest;
 import myaong.popolog.blogservice.dto.response.CommentPostResponse;
 import myaong.popolog.blogservice.dto.response.CommentUpdateResponse;
 import myaong.popolog.blogservice.dto.response.ReplyResponse;
@@ -33,13 +34,8 @@ public class CommentService {
     @Transactional
     public CommentPostResponse postComment(Long memberId, CommentPostRequest request) {
 
-        // 댓글 내용 검증
-        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-            throw new ApiException(ApiCode.INVALID_DATA);
-        }
-
         // 게시물 조회
-        Post post = postRepository.findById(Long.valueOf(request.getPostId()))
+        Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
 
         // 댓글 작성자 프로필 조회
@@ -172,7 +168,7 @@ public class CommentService {
 
     // 답글 수정
     @Transactional
-    public ReplyResponse updateReply(Long memberId, Long replyId, ReplyRequest request) {
+    public ReplyResponse updateReply(Long memberId, Long replyId, ReplyUpdateRequest request) {
         Comment updatedReply = updateContent(memberId, replyId, request.getContent());
         return ReplyResponse.builder()
                 .commentId(updatedReply.getId())

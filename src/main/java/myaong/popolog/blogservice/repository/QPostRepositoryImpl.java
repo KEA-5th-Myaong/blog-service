@@ -35,7 +35,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 						.join(reqPrejob).on(reqPrejob.jobId.eq(prejob.jobId))
 						.where(prejob.profile.eq(member),
 								reqPrejob.profile.eq(post.profile),
-								post.profile.ne(member))
+								post.profile.ne(member),
+								post.isBlinded.isFalse())
 						.exists())
 				.orderBy(post.id.desc())
 				.limit(10)
@@ -56,7 +57,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 						.where(prejob.profile.eq(member),
 								reqPrejob.profile.eq(post.profile),
 								post.profile.ne(member),
-								post.id.lt(lastId))
+								post.id.lt(lastId),
+								post.isBlinded.isFalse())
 						.exists())
 				.orderBy(post.id.desc())
 				.limit(10)
@@ -68,7 +70,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 
 		return jpaQueryFactory
 				.selectFrom(post)
-				.where(post.profile.in(profileQueryService.findFollowingOf(member)))
+				.where(post.profile.in(profileQueryService.findFollowingOf(member)),
+						post.isBlinded.isFalse())
 				.orderBy(post.id.desc())
 				.limit(10)
 				.fetch();
@@ -80,7 +83,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 		return jpaQueryFactory
 				.selectFrom(post)
 				.where(post.profile.in(profileQueryService.findFollowingOf(member)),
-						post.id.lt(lastId))
+						post.id.lt(lastId),
+						post.isBlinded.isFalse())
 				.orderBy(post.id.desc())
 				.limit(10)
 				.fetch();
@@ -94,7 +98,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 				.from(post)
 				.join(bookmark)
 				.on(post.id.eq(bookmark.post.id))
-				.where(bookmark.profile.eq(member))
+				.where(bookmark.profile.eq(member),
+						post.isBlinded.isFalse())
 				.orderBy(bookmark.id.desc())
 				.limit(10)
 				.fetch()
@@ -112,7 +117,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 				.join(bookmark)
 				.on(post.id.eq(bookmark.post.id))
 				.where(bookmark.profile.eq(member),
-						bookmark.id.lt(lastId))
+						bookmark.id.lt(lastId),
+						post.isBlinded.isFalse())
 				.orderBy(bookmark.id.desc())
 				.limit(10)
 				.fetch()
@@ -126,7 +132,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 
 		return jpaQueryFactory
 				.selectFrom(post)
-				.where(post.title.like("%" + query + "%").or(post.content.like("%" + query + "%")))
+				.where(post.title.like("%" + query + "%").or(post.content.like("%" + query + "%")),
+						post.isBlinded.isFalse())
 				.orderBy(post.id.desc())
 				.limit(10)
 				.fetch();
@@ -138,7 +145,8 @@ public class QPostRepositoryImpl implements QPostRepository {
 		return jpaQueryFactory
 				.selectFrom(post)
 				.where(post.title.like("%" + query + "%").or(post.content.like("%" + query + "%")),
-						post.id.lt(lastId))
+						post.id.lt(lastId),
+						post.isBlinded.isFalse())
 				.orderBy(post.id.desc())
 				.limit(10)
 				.fetch();

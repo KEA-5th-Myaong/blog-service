@@ -3,9 +3,11 @@ package myaong.popolog.blogservice.service;
 import myaong.popolog.blogservice.dto.request.PostCreateRequest;
 import myaong.popolog.blogservice.dto.request.ReportRequest;
 import myaong.popolog.blogservice.dto.response.*;
+import myaong.popolog.blogservice.entity.Post;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PostsService {
+	Post findById(Long postId);
 	PostDetailResponse getPostDetails(Long postId, Long memberId);
 	PostDetailResponse getPostByUrl(String username, String title, Long memberId);
 	PostsResponse getPostsOf(Long requesterId, Long memberId, Long lastId);

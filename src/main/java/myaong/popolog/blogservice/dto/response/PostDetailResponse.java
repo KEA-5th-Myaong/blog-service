@@ -18,7 +18,7 @@ public class PostDetailResponse {
     private int likeCount;
     private boolean isLiked;
     private boolean isBookmarked;
-    private int commentCount;
+    private long commentCount;
     private List<Comment> comments;
 
     @Getter

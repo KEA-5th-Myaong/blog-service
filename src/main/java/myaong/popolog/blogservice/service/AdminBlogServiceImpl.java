@@ -44,8 +44,14 @@ public class AdminBlogServiceImpl implements AdminBlogService {
                 .map(Report::getContentsId)
                 .collect(Collectors.toList());
 
-        List<Post> posts = postIds.isEmpty() ? List.of() : postRepository.findPostsByIds(postIds);
-        List<Comment> comments = commentIds.isEmpty() ? List.of() : commentRepository.findByIdIn(commentIds);
+        List<Post> posts = postIds.isEmpty() ? List.of()
+                : postRepository.findPostsByIds(postIds).stream()
+                .filter(post -> post.getIsBlinded().equals(false))
+                .toList();
+        List<Comment> comments = commentIds.isEmpty() ? List.of()
+                : commentRepository.findByIdIn(commentIds).stream()
+                .filter(post -> post.getIsBlinded().equals(false))
+                .toList();
 
         // Step 3: Fetch report counts
         Map<Long, Integer> reportCounts = reportRepository.countReportsByContents().stream()

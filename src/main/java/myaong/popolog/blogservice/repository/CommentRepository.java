@@ -12,7 +12,15 @@ import java.util.List;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-	List<Comment> findByPost(Post post);
+	List<Comment> findByPostAndIsBlinded(Post post, Boolean isBlinded);
+    default List<Comment> findByPost(Post post) {
+        return findByPostAndIsBlinded(post, false);
+    }
+
+    Long countByPostAndIsBlinded(Post post, Boolean isBlinded);
+    default Long countByPost(Post post) {
+        return countByPostAndIsBlinded(post, false);
+    }
 
     // 댓글 ID 목록으로 댓글 조회
     List<Comment> findByIdIn(List<Long> ids);

@@ -39,9 +39,15 @@ public class PostsServiceImpl implements PostsService {
     private final CommentRepository commentRepository;
 
     @Override
+    public Post findById(Long postId) {
+		return postRepository.findById(postId)
+				.orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+    }
+
+    @Override
     public PostDetailResponse getPostDetails(Long postId, Long memberId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+        Post post = findById(postId);
+        if (post.getIsBlinded()) throw new ApiException(ApiCode.POST_NOT_FOUND);
         return buildPostDetailResponse(post, memberId);
     }
 
@@ -49,11 +55,13 @@ public class PostsServiceImpl implements PostsService {
     public PostDetailResponse getPostByUrl(String username, String title, Long memberId) {
         Post post = postRepository.findByUsernameAndTitle(username, title)
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+        if (post.getIsBlinded()) throw new ApiException(ApiCode.POST_NOT_FOUND);
+
         return buildPostDetailResponse(post, memberId);
     }
 
     private PostDetailResponse buildPostDetailResponse(Post post, Long memberId) {
-        List<PostDetailResponse.Comment> commentResponses = post.getComments().stream()
+        List<PostDetailResponse.Comment> commentResponses = commentRepository.findByPost(post).stream()
                 .map(comment -> PostDetailResponse.Comment.builder()
                         .profilePicUrl(comment.getProfile() != null ? comment.getProfile().getProfilePicUrl() : null)
                         .memberId(comment.getProfile() != null ? comment.getProfile().getId() : null)
@@ -80,7 +88,7 @@ public class PostsServiceImpl implements PostsService {
                 .likeCount(post.getLikes().size())
                 .isLiked(isLiked)
                 .isBookmarked(isBookmarked)
-                .commentCount(post.getComments().size())
+                .commentCount(commentRepository.countByPost(post))
                 .comments(commentResponses)
                 .build();
     }
@@ -172,6 +180,7 @@ public class PostsServiceImpl implements PostsService {
 
         Profile profile = profileQueryService.findById(memberId);
         Post post = validatePermissionAndGetPostById(profile, postId);
+        if (post.getIsBlinded()) throw new ApiException(ApiCode.POST_NOT_FOUND);
 
         // 포스트 제목-프로필 중복 검증
         validateTitle_Profile(request.getTitle(), profile);
@@ -246,6 +255,7 @@ public class PostsServiceImpl implements PostsService {
         // 게시물 조회
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+        if (post.getIsBlinded()) throw new ApiException(ApiCode.POST_NOT_FOUND);
 
         // 기존 좋아요 여부 확인
         Optional<Like> existingLike = likeRepository.findByPostIdAndMemberId(postId, memberId);
@@ -300,6 +310,7 @@ public class PostsServiceImpl implements PostsService {
         // 게시물 조회
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ApiException(ApiCode.POST_NOT_FOUND));
+        if (post.getIsBlinded()) throw new ApiException(ApiCode.POST_NOT_FOUND);
 
         // 회원 프로필 조회
         Profile profile = profileQueryService.findById(memberId);
@@ -332,7 +343,7 @@ public class PostsServiceImpl implements PostsService {
     @Transactional
     public void reportPost(Long memberId, ReportRequest request) {
         // 콘텐츠 존재 여부 확인
-        ContentsType contentsType = request.getContentType();
+        ContentsType contentsType = ContentsType.valueOfLower(request.getContentType());
 
         if (contentsType == ContentsType.POST) {
             postRepository.findById(request.getContentId())

@@ -7,6 +7,7 @@ import myaong.popolog.blogservice.common.exception.ApiResponse;
 import myaong.popolog.blogservice.dto.request.CommentPostRequest;
 import myaong.popolog.blogservice.dto.request.CommentUpdateRequest;
 import myaong.popolog.blogservice.dto.request.ReplyRequest;
+import myaong.popolog.blogservice.dto.request.ReplyUpdateRequest;
 import myaong.popolog.blogservice.dto.response.CommentPostResponse;
 import myaong.popolog.blogservice.dto.response.CommentUpdateResponse;
 import myaong.popolog.blogservice.dto.response.ReplyResponse;
@@ -64,7 +65,7 @@ public class CommentController {
     public ResponseEntity<ApiResponse<ReplyResponse>> updateReply(
             @RequestHeader("memberId") Long memberId,
             @PathVariable Long replyId,
-            @RequestBody @Valid ReplyRequest request) {
+            @RequestBody @Valid ReplyUpdateRequest request) {
         ReplyResponse response = commentService.updateReply(memberId, replyId, request);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
     }
